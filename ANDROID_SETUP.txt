@@ -1,0 +1,6 @@
+هذا المشروع مصدر Flutter. لإنشاء ملفات Android وGradle:
+1) ثبت Flutter وAndroid SDK وأدوات Android build.
+2) من مجلد المشروع نفذ: flutter create --platforms=android .
+3) نفذ: flutter pub get
+4) راجع README_AR.md لبناء APK وAAB.
+لا تعتبر ملفات APK/AAB جاهزة قبل تنفيذ البناء والاختبار والتوقيع.
