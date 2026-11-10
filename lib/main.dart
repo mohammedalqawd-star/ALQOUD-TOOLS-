@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'entertainment.dart';
 
 const gold = Color(0xFFC9A227);
 const green = Color(0xFF073B2B);
@@ -31,8 +32,102 @@ class AlQoudApp extends StatelessWidget {
   );
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+class _HomePageState extends State<HomePage> {
+  int tab = 0;
+  int points = 0;
+  @override
+  void initState() { super.initState(); _loadPoints(); }
+  Future<void> _loadPoints() async {
+    final p = await SharedPreferences.getInstance();
+    if (mounted) setState(() => points = p.getInt('game_points') ?? 0);
+  }
+  Future<void> addPoints(int n) async {
+    final p = await SharedPreferences.getInstance();
+    points += n;
+    await p.setInt('game_points', points);
+    if (mounted) setState(() {});
+  }
+  @override
+  Widget build(BuildContext context) {
+    final pages = [
+      _Dashboard(points: points, go: (i) => setState(() => tab = i)),
+      QuizPage(onEarn: addPoints),
+      ChallengesPage(onEarn: addPoints),
+      const QuotesPage(),
+      const ToolsPage(),
+    ];
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: SafeArea(child: IndexedStack(index: tab, children: pages)),
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: green,
+          indicatorColor: gold.withOpacity(.2),
+          selectedIndex: tab,
+          onDestinationSelected: (i) => setState(() => tab = i),
+          destinations: const [
+            NavigationDestination(icon: Icon(Icons.home_outlined), label: 'الرئيسية'),
+            NavigationDestination(icon: Icon(Icons.quiz_outlined), label: 'اختبارات'),
+            NavigationDestination(icon: Icon(Icons.celebration_outlined), label: 'تحديات'),
+            NavigationDestination(icon: Icon(Icons.format_quote), label: 'عبارات'),
+            NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class _Dashboard extends StatelessWidget {
+  final int points;
+  final ValueChanged<int> go;
+  const _Dashboard({required this.points, required this.go});
+  @override
+  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(16), children: [
+    Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(colors: [Color(0xFF14543D), Color(0xFF071B16)]),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: gold),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('ALQOUD', style: TextStyle(color: gold, letterSpacing: 3, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 10),
+        const Text('تعلّم، تحدَّ نفسك، واستمتع!', style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        const Text('اختبارات وأسئلة وتحديات وعبارات جميلة في مكان واحد.'),
+        const SizedBox(height: 16),
+        Text('★  ' + points.toString() + ' نقطة', style: const TextStyle(color: gold, fontSize: 20, fontWeight: FontWeight.bold)),
+      ]),
+    ),
+    const SizedBox(height: 18),
+    const Text('الأقسام الرئيسية', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+    const SizedBox(height: 8),
+    _menuCard('اختبارات وأسئلة', 'اختبر معلوماتك واجمع النقاط', Icons.quiz, () => go(1)),
+    _menuCard('تحديات مضحكة', 'مهام خفيفة ومواقف مرحة', Icons.celebration, () => go(2)),
+    _menuCard('عبارات جميلة', 'كلمات تحفيزية وحكم قصيرة', Icons.format_quote, () => go(3)),
+    _menuCard('الأدوات والحاسبات', 'الأرباح والخصومات والفواتير', Icons.calculate, () => go(4)),
+    const SizedBox(height: 8),
+    const Text('النقاط للمتعة والتنافس الودي فقط، ولا توجد مراهنات أو جوائز مالية.', style: TextStyle(color: Colors.white60, fontSize: 12)),
+  ]);
+}
+Widget _menuCard(String title, String subtitle, IconData icon, VoidCallback action) => Card(
+  child: ListTile(
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+    leading: CircleAvatar(backgroundColor: gold.withOpacity(.15), child: Icon(icon, color: gold)),
+    title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+    subtitle: Text(subtitle),
+    trailing: const Icon(Icons.arrow_back_ios_new, color: gold, size: 16),
+    onTap: action,
+  ),
+);
+class ToolsPage extends StatelessWidget {
+  const ToolsPage({super.key});
   @override
   Widget build(BuildContext context) {
     final tools = <(String, IconData, Widget)>[
@@ -42,43 +137,14 @@ class HomePage extends StatelessWidget {
       ('الجملة والتجزئة', Icons.storefront, const WholesalePage()),
       ('الفواتير المحفوظة', Icons.receipt_long, const SavedPage()),
     ];
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        appBar: AppBar(title: const Text('ALQOUD TOOLS')),
-        body: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [green, Color(0xFF14543D)]),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: gold),
-              ),
-              child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('أدواتك التجارية في مكان واحد', style: TextStyle(fontSize: 20, color: gold, fontWeight: FontWeight.bold)),
-                SizedBox(height: 8),
-                Text('حسابات سهلة، وبيانات محفوظة على هاتفك. تعمل الأدوات الأساسية دون إنترنت.'),
-              ]),
-            ),
-            const SizedBox(height: 18),
-            ...tools.map((t) => Card(
-              color: const Color(0xFF102B22),
-              child: ListTile(
-                leading: Icon(t.$2, color: gold),
-                title: Text(t.$1),
-                trailing: const Icon(Icons.chevron_left),
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => t.$3)),
-              ),
-            )),
-            const SizedBox(height: 12),
-            const Text('الإعلانات قد تظهر عند تفعيل AdMob والاتصال بالإنترنت.'),
-            const SizedBox(height: 8),
-            const Text('ALQOUD TOOLS © 2026', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54)),
-          ],
-        ),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('الأدوات والحاسبات')),
+      body: ListView(padding: const EdgeInsets.all(16), children: tools.map((t) => Card(child: ListTile(
+        leading: Icon(t.$2, color: gold),
+        title: Text(t.$1),
+        trailing: const Icon(Icons.chevron_left),
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => t.$3)),
+      ))).toList()),
     );
   }
 }
