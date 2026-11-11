@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
     final pages = [
       _Dashboard(points: points, go: _selectTab),
       GamesHubPage(onEarn: addPoints),
-      ChallengesPage(onEarn: addPoints),
+      DailyChallengePage(onEarn: addPoints),
       const QuoteLibraryPage(),
       const ToolsPage(),
       const LanguageLearningPage(),
