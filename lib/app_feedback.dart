@@ -5,11 +5,19 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum SoundCue { open, correct, wrong, win }
 
 class AppFeedback {
+  static Future<void> setEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('sound_enabled', enabled);
+  }
+
   static Future<void> play(SoundCue cue) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('sound_enabled') ?? true)) return;
     final patterns = <SoundCue, List<double>>{
       SoundCue.open: [523.25, 659.25, 783.99],
       SoundCue.correct: [659.25, 783.99],
