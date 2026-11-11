@@ -72,6 +72,23 @@ jobs:
               path.write_text(content)
           PY
 
+      - name: Add Android text-to-speech visibility query
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("android/app/src/main/AndroidManifest.xml")
+          content = path.read_text()
+          query = '''    <queries>
+                  <intent>
+                      <action android:name="android.intent.action.TTS_SERVICE"/>
+                  </intent>
+              </queries>
+          '''
+          if "android.intent.action.TTS_SERVICE" not in content:
+              content = content.replace("<application", query + "    <application", 1)
+              path.write_text(content)
+          PY
+
       - name: Resolve packages
         run: flutter pub get
 
