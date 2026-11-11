@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -126,6 +127,18 @@ class QuizLevelsPage extends StatelessWidget {
       body: ListView(padding: const EdgeInsets.all(16), children: [
         const Text('كل إجابة صحيحة تمنحك 10 نقاط لأول مرة.', style: TextStyle(color: gold)),
         const SizedBox(height: 12),
+        Card(
+          color: const Color(0xFF183C30),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(16),
+            leading: const CircleAvatar(backgroundColor: Color(0x3348B887), child: Icon(Icons.all_inclusive, color: Color(0xFF48B887), size: 30)),
+            title: const Text('التحدي المفتوح • أسئلة متجددة', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('العب بلا حدّ للجولات مع مسائل تتولد تلقائياً'),
+            trailing: const Icon(Icons.play_circle_fill, color: gold, size: 30),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn))),
+          ),
+        ),
+        const SizedBox(height: 12),
         ...levels.map((l) => Card(color: panel, child: ListTile(
           contentPadding: const EdgeInsets.all(16),
           leading: CircleAvatar(backgroundColor: (l[4] as Color).withOpacity(.18), child: Icon(l[2] as IconData, color: l[4] as Color)),
@@ -137,6 +150,163 @@ class QuizLevelsPage extends StatelessWidget {
       ]),
     );
   }
+}
+
+
+class EndlessQuizPage extends StatefulWidget {
+  final Future<void> Function(int) onEarn;
+  const EndlessQuizPage({super.key, required this.onEarn});
+  @override
+  State<EndlessQuizPage> createState() => _EndlessQuizPageState();
+}
+
+class _EndlessQuizPageState extends State<EndlessQuizPage> {
+  final math.Random random = math.Random();
+  late Q current;
+  late String sessionId;
+  int number = 1, score = 0, correct = 0;
+  int? selected;
+  bool rewarded = false;
+  String feedback = '';
+  String difficulty = 'متوسط';
+
+  @override
+  void initState() {
+    super.initState();
+    sessionId = DateTime.now().microsecondsSinceEpoch.toString();
+    current = makeQuestion();
+  }
+
+  Q makeQuestion() {
+    final int min = difficulty == 'سهل' ? 1 : difficulty == 'متوسط' ? 8 : 15;
+    final int max = difficulty == 'سهل' ? 20 : difficulty == 'متوسط' ? 60 : 120;
+    final a = min + random.nextInt(max - min + 1);
+    final b = min + random.nextInt(max - min + 1);
+    final op = random.nextInt(difficulty == 'صعب' ? 3 : 2);
+    late int answer;
+    late String symbol;
+    if (op == 0) {
+      answer = a + b;
+      symbol = '+';
+    } else if (op == 1) {
+      final high = math.max(a, b), low = math.min(a, b);
+      answer = high - low;
+      symbol = '−';
+    } else {
+      answer = a * b;
+      symbol = '×';
+    }
+    final options = <int>{answer};
+    while (options.length < 4) {
+      final delta = 1 + random.nextInt(math.max(5, answer.abs() ~/ 3 + 5));
+      final candidate = random.nextBool() ? answer + delta : math.max(0, answer - delta);
+      options.add(candidate);
+    }
+    final choices = options.map((v) => v.toString()).toList()..shuffle(random);
+    return Q('كم ناتج $a $symbol $b ؟', choices, choices.indexOf(answer.toString()));
+  }
+
+  Future<void> choose(int value) async {
+    if (selected != null) return;
+    setState(() => selected = value);
+    if (value == current.answer) {
+      correct++;
+      score += 5;
+      final first = await awardOnce('endless_${sessionId}_$number', 5, widget.onEarn);
+      if (mounted) setState(() {
+        rewarded = first;
+        feedback = first ? 'إجابة صحيحة! +5 نقاط' : 'إجابة صحيحة!';
+      });
+    } else {
+      setState(() => feedback = 'الإجابة الصحيحة: ${current.choices[current.answer]}');
+    }
+  }
+
+  void next() {
+    setState(() {
+      number++;
+      current = makeQuestion();
+      selected = null;
+      rewarded = false;
+      feedback = '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('التحدي المفتوح')),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Color(0xFF176247), deep]),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: gold.withOpacity(.6)),
+        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('جولات متجددة', style: TextStyle(color: gold, fontWeight: FontWeight.bold)),
+            Text('السؤال رقم $number', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+          ]),
+          Column(children: [
+            const Icon(Icons.stars, color: gold, size: 28),
+            Text('$score نقطة', style: const TextStyle(color: gold, fontWeight: FontWeight.bold)),
+          ]),
+        ]),
+      ),
+      const SizedBox(height: 14),
+      const Text('اختر مستوى الصعوبة'),
+      const SizedBox(height: 8),
+      SegmentedButton<String>(
+        segments: const [
+          ButtonSegment(value: 'سهل', label: Text('سهل')),
+          ButtonSegment(value: 'متوسط', label: Text('متوسط')),
+          ButtonSegment(value: 'صعب', label: Text('صعب')),
+        ],
+        selected: {difficulty},
+        onSelectionChanged: (values) => setState(() {
+          difficulty = values.first;
+          current = makeQuestion();
+          selected = null;
+          feedback = '';
+        }),
+      ),
+      const SizedBox(height: 24),
+      Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(color: panel, borderRadius: BorderRadius.circular(20)),
+        child: Column(children: [
+          const Icon(Icons.psychology_alt, color: gold, size: 42),
+          const SizedBox(height: 12),
+          Text(current.text, textAlign: TextAlign.center, style: const TextStyle(fontSize: 27, fontWeight: FontWeight.bold)),
+        ]),
+      ),
+      const SizedBox(height: 16),
+      ...List.generate(current.choices.length, (i) => Padding(
+        padding: const EdgeInsets.only(bottom: 9),
+        child: OutlinedButton(
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.all(17),
+            backgroundColor: selected != null && i == current.answer ? green : Colors.transparent,
+            side: BorderSide(color: selected != null && i == current.answer ? gold : Colors.white24),
+          ),
+          onPressed: selected == null ? () => choose(i) : null,
+          child: Text(current.choices[i], style: const TextStyle(fontSize: 18)),
+        ),
+      )),
+      if (feedback.isNotEmpty) Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Text(feedback, textAlign: TextAlign.center, style: const TextStyle(color: gold, fontWeight: FontWeight.bold)),
+      ),
+      FilledButton.icon(
+        onPressed: selected == null ? null : next,
+        icon: const Icon(Icons.skip_next),
+        label: const Text('السؤال التالي'),
+      ),
+      const SizedBox(height: 8),
+      Text('إجابات صحيحة: $correct • كل سؤال جديد يُنشأ تلقائياً. النقاط إنجاز افتراضي داخل التطبيق.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+    ]),
+  );
 }
 
 class QuizPlayPage extends StatefulWidget {
