@@ -15,9 +15,12 @@ class AppFeedback {
     await prefs.setBool('sound_enabled', enabled);
   }
 
+  static final AudioPlayer _player = AudioPlayer();
+  static bool _playing = false;
+
   static Future<void> play(SoundCue cue) async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool('sound_enabled') ?? true)) return;
+    if (!(prefs.getBool('sound_enabled') ?? true) || _playing) return;
     final patterns = <SoundCue, List<double>>{
       SoundCue.open: [523.25, 659.25, 783.99],
       SoundCue.correct: [659.25, 783.99],
@@ -25,17 +28,24 @@ class AppFeedback {
       SoundCue.win: [523.25, 659.25, 783.99, 1046.5],
     };
     final notes = patterns[cue]!;
-    final bytes = _makeWave(notes);
-    final player = AudioPlayer();
+    _playing = true;
     try {
-      await player.setPlayerMode(PlayerMode.lowLatency);
-      await player.play(BytesSource(bytes));
-      await Future<void>.delayed(Duration(milliseconds: notes.length * 210 + 100));
+      await _player.stop();
+      await _player.setPlayerMode(PlayerMode.mediaPlayer);
+      await _player.setReleaseMode(ReleaseMode.stop);
+      await _player.setVolume(0.85);
+      final completed = _player.onPlayerComplete.first;
+      await _player.play(BytesSource(_makeWave(notes), mimeType: 'audio/wav'));
+      await completed.timeout(Duration(milliseconds: notes.length * 260 + 1200));
     } catch (_) {
-      // Audio is optional; the game remains usable if the device blocks playback.
+      // Keep the app usable if the device audio service is unavailable.
     } finally {
-      await player.dispose();
+      _playing = false;
     }
+  }
+
+  static Future<void> testSound() async {
+    await play(SoundCue.win);
   }
 
   static Uint8List _makeWave(List<double> notes) {
