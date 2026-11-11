@@ -68,20 +68,48 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
   static const _categories = ['الكل', 'تحفيز', 'نجاح', 'حكمة', 'أخلاق', 'أمل', 'علم', 'المفضلة'];
   String selected = 'الكل';
   Set<String> favorites = <String>{};
+  Set<String> seenQuotes = <String>{};
   int dailyIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    dailyIndex = (now.year * 366 + now.month * 31 + now.day) % _quotes.length;
     _loadFavorites();
   }
 
   Future<void> _loadFavorites() async {
     final prefs = await SharedPreferences.getInstance();
+    var seen = (prefs.getStringList('seen_quotes_v1') ?? <String>[]).toSet();
+    if (seen.length >= _quotes.length) {
+      seen.clear();
+      await prefs.remove('seen_quotes_v1');
+    }
+    final unseen = _quotes.where((q) => !seen.contains(q.text)).toList();
+    final now = DateTime.now();
+    final dayIndex = (now.year * 366 + now.month * 31 + now.day) % unseen.length;
     if (!mounted) return;
-    setState(() => favorites = (prefs.getStringList('favorite_quotes_v2') ?? []).toSet());
+    setState(() {
+      favorites = (prefs.getStringList('favorite_quotes_v2') ?? []).toSet();
+      seenQuotes = seen;
+      dailyIndex = _quotes.indexOf(unseen[dayIndex]);
+    });
+  }
+
+  Future<void> _markSeen(String quote) async {
+    final next = Set<String>.from(seenQuotes)..add(quote);
+    if (next.length >= _quotes.length) next.clear();
+    final prefs = await SharedPreferences.getInstance();
+    if (next.isEmpty) {
+      await prefs.remove('seen_quotes_v1');
+    } else {
+      await prefs.setStringList('seen_quotes_v1', next.toList());
+    }
+    final unseen = _quotes.where((q) => !next.contains(q.text)).toList();
+    if (!mounted) return;
+    setState(() {
+      seenQuotes = next;
+      if (unseen.isNotEmpty) dailyIndex = _quotes.indexOf(unseen[math.Random().nextInt(unseen.length)]);
+    });
   }
 
   Future<void> _toggleFavorite(String quote) async {
@@ -110,8 +138,9 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
   @override
   Widget build(BuildContext context) {
     final filtered = _quotes.where((q) {
-      if (selected == 'الكل') return true;
       if (selected == 'المفضلة') return favorites.contains(q.text);
+      if (seenQuotes.contains(q.text)) return false;
+      if (selected == 'الكل') return true;
       return q.category == selected;
     }).toList();
 
@@ -168,13 +197,20 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
                     style: const TextStyle(fontSize: 21, height: 1.8, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 14),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: () => _copy(_quotes[dailyIndex].text),
-                      icon: const Icon(Icons.copy, color: _gold, size: 18),
-                      label: const Text('نسخ العبارة', style: TextStyle(color: _gold)),
-                    ),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () => _copy(_quotes[dailyIndex].text),
+                        icon: const Icon(Icons.copy, color: _gold, size: 18),
+                        label: const Text('نسخ العبارة', style: TextStyle(color: _gold)),
+                      ),
+                      TextButton.icon(
+                        onPressed: () => _markSeen(_quotes[dailyIndex].text),
+                        icon: const Icon(Icons.check_circle_outline, color: _gold, size: 18),
+                        label: const Text('تمت القراءة', style: TextStyle(color: _gold)),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -257,6 +293,12 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
                             visualDensity: VisualDensity.compact,
                             onPressed: () => _toggleFavorite(quote.text),
                             icon: Icon(favorite ? Icons.favorite : Icons.favorite_border, color: favorite ? Colors.pinkAccent : Colors.white60),
+                          ),
+                          IconButton(
+                            tooltip: 'تمت القراءة - إخفاء العبارة',
+                            visualDensity: VisualDensity.compact,
+                            onPressed: () => _markSeen(quote.text),
+                            icon: const Icon(Icons.check_circle_outline, color: _gold),
                           ),
                           IconButton(
                             tooltip: 'نسخ',
