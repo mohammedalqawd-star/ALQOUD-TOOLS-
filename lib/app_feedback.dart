@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
@@ -16,11 +17,19 @@ class AppFeedback {
   }
 
   static final AudioPlayer _player = AudioPlayer();
-  static bool _playing = false;
+  static final FlutterTts _tts = FlutterTts();
+  static Future<void> _soundQueue = Future<void>.value();
 
-  static Future<void> play(SoundCue cue) async {
+  // Queue effects so rapid answers never cause a sound to be silently dropped.
+  static Future<void> play(SoundCue cue) {
+    final next = _soundQueue.then((_) => _playNow(cue));
+    _soundQueue = next.catchError((Object _) {});
+    return next;
+  }
+
+  static Future<void> _playNow(SoundCue cue) async {
     final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool('sound_enabled') ?? true) || _playing) return;
+    if (!(prefs.getBool('sound_enabled') ?? true)) return;
     final patterns = <SoundCue, List<double>>{
       SoundCue.open: [523.25, 659.25, 783.99],
       SoundCue.correct: [659.25, 783.99],
@@ -28,7 +37,6 @@ class AppFeedback {
       SoundCue.win: [523.25, 659.25, 783.99, 1046.5],
     };
     final notes = patterns[cue]!;
-    _playing = true;
     try {
       await _player.stop();
       await _player.setPlayerMode(PlayerMode.mediaPlayer);
@@ -39,8 +47,24 @@ class AppFeedback {
       await completed.timeout(Duration(milliseconds: notes.length * 260 + 1200));
     } catch (_) {
       // Keep the app usable if the device audio service is unavailable.
-    } finally {
-      _playing = false;
+    } catch (_) {
+      // Audio failures must never interrupt gameplay.
+    }
+  }
+
+  static Future<void> speakWelcome() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!(prefs.getBool('sound_enabled') ?? true)) return;
+    try {
+      await _tts.stop();
+      await _tts.setLanguage('ar');
+      await _tts.setSpeechRate(0.46);
+      await _tts.setPitch(1.0);
+      await _tts.setVolume(1.0);
+      await _tts.awaitSpeakCompletion(true);
+      await _tts.speak('مرحباً بك في تطبيق القعود تولز، ALQOUD TOOLS');
+    } catch (_) {
+      // Arabic voice availability depends on the Android text-to-speech engine.
     }
   }
 
