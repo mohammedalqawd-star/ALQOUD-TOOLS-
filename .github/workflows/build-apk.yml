@@ -35,10 +35,8 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
 
-          candidates = [
-              Path("android/app/build.gradle.kts"),
-              Path("android/app/build.gradle"),
-          ]
+          nl = chr(10)
+          candidates = [Path("android/app/build.gradle.kts"), Path("android/app/build.gradle")]
           gradle = next((p for p in candidates if p.exists()), None)
           if gradle is None:
               raise SystemExit("Android app Gradle file was not generated")
@@ -48,16 +46,15 @@ jobs:
               setting = "        isCoreLibraryDesugaringEnabled = true"
               dependency = '    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")'
               if "isCoreLibraryDesugaringEnabled" not in content:
-                  content = content.replace("    compileOptions {", "    compileOptions {\\n" + setting, 1)
-              if "coreLibraryDesugaring(" not in content:
-                  content += "\\n\\ndependencies {\\n" + dependency + "\\n}\\n"
+                  content = content.replace("    compileOptions {", "    compileOptions {" + nl + setting, 1)
           else:
               setting = "        coreLibraryDesugaringEnabled true"
               dependency = "    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'"
               if "coreLibraryDesugaringEnabled" not in content:
-                  content = content.replace("    compileOptions {", "    compileOptions {\\n" + setting, 1)
-              if "coreLibraryDesugaring " not in content:
-                  content += "\\n\\ndependencies {\\n" + dependency + "\\n}\\n"
+                  content = content.replace("    compileOptions {", "    compileOptions {" + nl + setting, 1)
+
+          if "desugar_jdk_libs" not in content:
+              content += nl + nl + "dependencies {" + nl + dependency + nl + "}" + nl
 
           gradle.write_text(content)
           print(f"Enabled core library desugaring in {gradle}")
