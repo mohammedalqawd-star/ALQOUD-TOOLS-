@@ -406,46 +406,104 @@ List<Q> _stageQuestionsFromPairs(List<(String, String)> pairs, int seed) {
   });
 }
 
-// Build a different deterministic set for every stage. Difficulty rises in four bands.
-List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
-  if (bank.isEmpty) return const <Q>[];
-  final random = math.Random(stage * 7919 + key.length * 101);
+// Generate a fresh arithmetic set for every stage. Operand ranges do not overlap between stages.
+List<Q> _mathQuestionsForStage(int stage) {
   final tier = (stage - 1) ~/ 250;
-  // Each 250-stage band moves forward through the source bank, with a small overlap.
-  final from = (bank.length * (tier * 0.20)).floor();
-  final until = math.min(bank.length, (bank.length * (0.60 + tier * 0.20)).ceil());
-  final band = List<int>.generate(math.max(1, until - from), (i) => from + i);
-  band.shuffle(random);
-  final count = math.min(10, band.length);
-  final start = ((stage - 1) * 10) % band.length;
-  final result = <Q>[];
-  for (var i = 0; i < count; i++) {
-    final sourceIndex = band[(start + i) % band.length];
-    final original = bank[sourceIndex];
+  final out = <Q>[];
+  for (var i = 0; i < 10; i++) {
+    final a = 2 + (stage - 1) * 10 + i;
+    final b = 2 + ((stage * 17 + i * 23) % (tier < 1 ? 18 : tier < 2 ? 47 : 97));
+    final opIndex = (stage + i) % (tier < 2 ? 3 : 4);
+    late int answer;
+    late String symbol;
+    switch (opIndex) {
+      case 0: answer = a + b; symbol = '+'; break;
+      case 1: answer = a - b; symbol = '−'; break;
+      case 2: answer = a * b; symbol = '×'; break;
+      default:
+        final divisor = b == 0 ? 1 : b;
+        final dividend = a * divisor;
+        answer = dividend ~/ divisor;
+        symbol = '÷';
+        final values = <int>{answer, answer + 1, answer - 1, answer + 2}.toList()..shuffle(math.Random(stage * 7919 + i));
+        final choices = values.map((v) => v.toString()).toList();
+        out.add(Q('تحدي الحسابات المتقدم: $dividend ÷ $divisor = ؟', choices, choices.indexOf(answer.toString())));
+        continue;
+    }
+    final offsets = tier == 0 ? <int>[1, 2, 3] : tier == 1 ? <int>[2, 5, 7] : <int>[3, 9, 13];
+    final values = <int>{answer};
+    for (final offset in offsets) {
+      values.add(answer + offset);
+      if (answer - offset >= 0) values.add(answer - offset);
+    }
+    final choices = values.take(4).map((v) => v.toString()).toList()..shuffle(math.Random(stage * 104729 + i * 97));
+    out.add(Q('احسب بدقة: $a $symbol $b = ؟', choices, choices.indexOf(answer.toString())));
+  }
+  return out;
+}
+
+List<Q> _trueFalseQuestionsForStage(int stage) {
+  final r = math.Random(stage * 3571);
+  final out = <Q>[];
+  final choices = <String>['صح', 'خطأ', 'كلاهما', 'لا يمكن تحديد ذلك'];
+  for (var i = 0; i < 10; i++) {
+    final a = 20 + stage * 13 + i * 7;
+    final b = 2 + r.nextInt(19);
+    final kind = (stage + i) % 5;
+    late String statement;
+    late bool truth;
+    switch (kind) {
+      case 0:
+        truth = a % 2 == 0;
+        statement = 'العدد $a عدد زوجي.';
+        break;
+      case 1:
+        truth = a % b == 0;
+        statement = 'العدد $a يقبل القسمة على $b دون باقٍ.';
+        break;
+      case 2:
+        final value = a * a + ((i.isEven) ? 0 : 1);
+        truth = value == a * a;
+        statement = 'مربع العدد $a يساوي $value.';
+        break;
+      case 3:
+        final value = a + b + (i.isEven ? 0 : 2);
+        truth = value == a + b;
+        statement = 'مجموع $a و$b يساوي $value.';
+        break;
+      default:
+        final value = a - b + (i.isEven ? 0 : 3);
+        truth = value == a - b;
+        statement = 'ناتج طرح $b من $a يساوي $value.';
+        break;
+    }
+    out.add(Q(statement, choices, truth ? 0 : 1));
+  }
+  return out;
+}
+
+// Every stage receives a stable, non-repeating slice of the available bank.
+// The four bands raise the instruction complexity; factual content is not fabricated.
+List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
+  if (key == 'math_stages') return _mathQuestionsForStage(stage);
+  if (key == 'true_false_stages') return _trueFalseQuestionsForStage(stage);
+  if (bank.isEmpty) return const <Q>[];
+  final tier = (stage - 1) ~/ 250;
+  final start = ((stage - 1) * 10) % bank.length;
+  final prefix = switch (tier) {
+    0 => 'المستوى التأسيسي: ',
+    1 => 'المستوى المتقدم: ',
+    2 => 'مستوى الخبراء: ',
+    _ => 'مستوى المحترفين: ',
+  };
+  return List<Q>.generate(10, (i) {
+    final original = bank[(start + i) % bank.length];
     final choices = List<String>.from(original.choices);
     final correctText = choices[original.answer];
-    choices.shuffle(math.Random(stage * 104729 + i * 97));
-    final prefix = switch (tier) {
-      0 => 'تحدي تأسيسي: ',
-      1 => 'تحدي متقدم: حلّل السؤال ثم أجب: ',
-      2 => 'تحدي خبير: انتبه للتفاصيل واستبعد الخيارات المتشابهة: ',
-      _ => 'تحدي المحترفين: اختر الإجابة الأدق بعد التفكير في جميع الاحتمالات: ',
-    };
-    result.add(Q(prefix + original.text, choices, choices.indexOf(correctText)));
-  }
-  var variant = 0;
-  while (result.length < 10) {
-    final original = bank[band[(start + variant) % band.length]];
-    final choices = List<String>.from(original.choices);
-    final correctText = choices[original.answer];
-    choices.shuffle(math.Random(stage * 65537 + variant * 131));
-    final wording = variant.isEven
-        ? 'صيغة إضافية: ما الإجابة الصحيحة للسؤال التالي؟ '
-        : 'اختبر فهمك: حدّد الاختيار المطابق للمعنى: ';
-    result.add(Q(wording + original.text, choices, choices.indexOf(correctText)));
-    variant++;
-  }
-  return result;
+    choices.shuffle(math.Random(stage * 104729 + i * 97 + key.length));
+    final instruction = tier == 0 ? 'أجب عن السؤال: ' : tier == 1 ? 'فكّر جيداً ثم أجب: ' : tier == 2 ? 'حلّل التلميح واختر الأدق: ' : 'تحدّ المحترفين واختر الإجابة الأدق: ';
+    return Q(prefix + instruction + original.text, choices, choices.indexOf(correctText));
+  });
 }
 
 List<Q> riddleStageQuestions() => _stageQuestionsFromPairs(
