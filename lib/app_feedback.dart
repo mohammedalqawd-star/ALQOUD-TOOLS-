@@ -59,7 +59,8 @@ class AppFeedback {
     ascii(36, 'data');
     header.setUint32(40, dataSize, Endian.little);
     var cursor = 44;
-    for (final frequency in notes) {
+    for (var noteIndex = 0; noteIndex < notes.length; noteIndex++) {
+      final frequency = notes[noteIndex];
       for (var i = 0; i < samplesPerNote; i++) {
         final t = i / sampleRate;
         final edge = math.min(1.0, math.min(i / 500.0, (samplesPerNote - i) / 900.0));
@@ -67,9 +68,11 @@ class AppFeedback {
         header.setInt16(cursor, sample, Endian.little);
         cursor += 2;
       }
-      for (var i = 0; i < gapSamples; i++) {
-        header.setInt16(cursor, 0, Endian.little);
-        cursor += 2;
+      if (noteIndex < notes.length - 1) {
+        for (var i = 0; i < gapSamples; i++) {
+          header.setInt16(cursor, 0, Endian.little);
+          cursor += 2;
+        }
       }
     }
     return bytes;
