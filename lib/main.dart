@@ -158,8 +158,8 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         body: SafeArea(child: IndexedStack(index: tab, children: pages)),
         bottomNavigationBar: NavigationBar(
-          backgroundColor: green,
-          indicatorColor: gold.withOpacity(.2),
+          backgroundColor: [green, const Color(0xFF15566A), const Color(0xFF813C4A), const Color(0xFF49316E), const Color(0xFF183B63)][tab],
+          indicatorColor: Colors.white.withOpacity(.18),
           selectedIndex: tab,
           onDestinationSelected: (i) => setState(() => tab = i),
           destinations: const [
@@ -476,9 +476,9 @@ class _ToolsPageState extends State<ToolsPage> {
           ),
         ),
         Card(
-          color: const Color(0xFF153D30),
+          color: const Color(0xFF1A3455),
           child: SwitchListTile(
-            secondary: const Icon(Icons.notifications_active, color: gold),
+            secondary: const Icon(Icons.notifications_active, color: Color(0xFFD8E8FF)),
             title: const Text('التذكير اليومي'),
             subtitle: const Text('إشعار يومي الساعة 7 مساءً لتجربة تحدٍ جديد'),
             value: reminderEnabled,
