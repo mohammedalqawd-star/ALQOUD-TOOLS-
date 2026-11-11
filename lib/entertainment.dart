@@ -179,12 +179,11 @@ class QuizLevelsPage extends StatelessWidget {
           subtitle: const Text('تحدٍّ جديد يتغير تلقائياً كل يوم'),
           trailing: const Icon(Icons.play_circle_fill, color: Color(0xFFD7B8FF)),
           onTap: () {
-            final day = DateTime.now().difference(DateTime(2024, 1, 1)).inDays;
-            final bank = generatedQuestionBank();
-            final start = (day * 10) % (bank.length - 10);
             Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(
-              title: 'اختبار اليوم', questions: bank.skip(start).take(10).toList(),
-              levelKey: 'daily_' + DateTime.now().toIso8601String().substring(0, 10),
+              title: 'اختبار اليوم',
+              questions: generatedQuestionBank(),
+              levelKey: 'daily_1200_pool',
+              questionLimit: 10,
               onEarn: onEarn,
             )));
           },
@@ -365,8 +364,9 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
 class QuizPlayPage extends StatefulWidget {
   final String title, levelKey;
   final List<Q> questions;
+  final int? questionLimit;
   final Future<void> Function(int) onEarn;
-  const QuizPlayPage({super.key, required this.title, required this.questions, required this.levelKey, required this.onEarn});
+  const QuizPlayPage({super.key, required this.title, required this.questions, required this.levelKey, required this.onEarn, this.questionLimit});
   @override
   State<QuizPlayPage> createState() => _QuizPlayPageState();
 }
@@ -385,8 +385,11 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
   }
   Future<void> _loadProgress() async {
     final unseen = await loadUnseenOrder('seen_quiz_${widget.levelKey}', widget.questions.length);
+    final selected = widget.questionLimit == null
+        ? unseen
+        : unseen.take(widget.questionLimit!).toList();
     if (!mounted) return;
-    setState(() { order = unseen; ready = true; });
+    setState(() { order = selected; ready = true; });
   }
   Q get current => widget.questions[order[index]];
   Future<void> choose(int n) async {
