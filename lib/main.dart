@@ -464,6 +464,7 @@ class _ToolsPageState extends State<ToolsPage> {
       ('دفتر المصروفات والإيرادات', Icons.account_balance_wallet_rounded, const ExpenseBookPage()),
       ('محول الوحدات', Icons.swap_horiz_rounded, const UnitConverterPage()),
       ('ملاحظاتي السريعة', Icons.sticky_note_2_rounded, const QuickNotesPage()),
+      ('إنجازاتي وشاراتي', Icons.workspace_premium_rounded, const AchievementsPage()),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFF101D35),
