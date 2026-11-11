@@ -516,11 +516,17 @@ class _CalcPageState extends State<CalcPage> {
     if (widget.title.contains('الأقساط')) return const Color(0xFF70B8FF);
     return const Color(0xFFC19BFF);
   }
+  Color get _pageBackground {
+    if (widget.title.contains('الأرباح')) return const Color(0xFF102B25);
+    if (widget.title.contains('الخصومات')) return const Color(0xFF321F2B);
+    if (widget.title.contains('الأقساط')) return const Color(0xFF172B42);
+    return const Color(0xFF2A2140);
+  }
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
     child: Scaffold(
-      backgroundColor: const Color(0xFF111827),
+      backgroundColor: _pageBackground,
       appBar: AppBar(backgroundColor: _accent.withOpacity(.18), foregroundColor: _accent, title: Text(widget.title)),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         ...List.generate(widget.labels.length, (i) => Padding(
@@ -541,7 +547,7 @@ class _CalcPageState extends State<CalcPage> {
           child: const Text('احسب'),
         ),
         const SizedBox(height: 16),
-        Card(color: green, child: Padding(padding: const EdgeInsets.all(18), child: SelectableText(result, style: TextStyle(fontSize: 18, color: _accent, fontWeight: FontWeight.w700)))),
+        Card(color: _accent.withOpacity(.16), child: Padding(padding: const EdgeInsets.all(18), child: SelectableText(result, style: TextStyle(fontSize: 18, color: _accent, fontWeight: FontWeight.w700)))),
       ]),
     ),
   );
