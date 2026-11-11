@@ -178,56 +178,232 @@ class _Dashboard extends StatelessWidget {
   final int points;
   final ValueChanged<int> go;
   const _Dashboard({required this.points, required this.go});
+
   @override
-  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.all(16), children: [
-    Container(
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF14543D), Color(0xFF071B16)]),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: gold),
+  Widget build(BuildContext context) {
+    final level = points >= 700 ? 4 : points >= 300 ? 3 : points >= 100 ? 2 : 1;
+    final levelName = ['مستكشف', 'متعلّم', 'مبدع', 'عبقري', 'أسطورة'][level];
+    final lower = level == 1 ? 0 : level == 2 ? 100 : level == 3 ? 300 : 700;
+    final upper = level == 1 ? 100 : level == 2 ? 300 : level == 3 ? 700 : 1000;
+    final progress = level == 4 ? 1.0 : ((points - lower) / (upper - lower)).clamp(0.0, 1.0);
+
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF071B16), Color(0xFF0A2B20), Color(0xFF061710)],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(children: [AlQoudLogo(size: 46), SizedBox(width: 12), Text('ALQOUD TOOLS', style: TextStyle(color: gold, letterSpacing: 2, fontWeight: FontWeight.bold))]),
-        const SizedBox(height: 10),
-        const Text('تعلّم، تحدَّ نفسك، واستمتع!', style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        const Text('اختبارات وأسئلة وتحديات وعبارات جميلة في مكان واحد.'),
-        const SizedBox(height: 16),
-        Text('★  ' + points.toString() + ' نقطة', style: const TextStyle(color: gold, fontSize: 20, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-        Text(points >= 700 ? 'المستوى 4 • أسطورة الذكاء' : points >= 300 ? 'المستوى 3 • عبقري' : points >= 100 ? 'المستوى 2 • سريع البديهة' : 'المستوى 1 • مستكشف',
-          style: const TextStyle(color: Colors.white70)),
-        const SizedBox(height: 8),
-        ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(
-          minHeight: 7,
-          value: points >= 700 ? 1 : points >= 300 ? (points - 300) / 400 : points >= 100 ? (points - 100) / 200 : points / 100,
-          color: gold,
-          backgroundColor: Colors.white12,
-        )),
-      ]),
-    ),
-    const SizedBox(height: 18),
-    const Text('الأقسام الرئيسية', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-    const SizedBox(height: 8),
-    _menuCard('الألعاب والاختبارات', 'ألغاز وتخمين وأسئلة بثلاثة مستويات', Icons.sports_esports, () => go(1)),
-    _menuCard('التحدي اليومي', 'مهمة جديدة ونقاط إنجاز كل يوم', Icons.today, () => go(2)),
-    _menuCard('عبارات جميلة', 'كلمات تحفيزية وحكم قصيرة', Icons.format_quote, () => go(3)),
-    _menuCard('الأدوات والحاسبات', 'الأرباح والخصومات والفواتير', Icons.calculate, () => go(4)),
-    const SizedBox(height: 8),
-    const Text('النقاط للمتعة والتنافس الودي فقط، ولا توجد مراهنات أو جوائز مالية.', style: TextStyle(color: Colors.white60, fontSize: 12)),
-  ]);
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+        children: [
+          Row(
+            children: [
+              const AlQoudLogo(size: 48),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('ALQOUD TOOLS', style: TextStyle(color: Color(0xFFE8D9A0), fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 1.5)),
+                    SizedBox(height: 3),
+                    Text('مساحتك للمعرفة والمرح', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                  ],
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(color: Colors.white.withOpacity(.07), shape: BoxShape.circle, border: Border.all(color: Colors.white12)),
+                child: IconButton(
+                  tooltip: 'الأدوات والإعدادات',
+                  onPressed: () => go(4),
+                  icon: const Icon(Icons.tune_rounded, color: Color(0xFFE8D9A0)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+          Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1C6A4B), Color(0xFF10422F), Color(0xFF09251B)],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+              border: Border.all(color: gold.withOpacity(.75), width: 1.1),
+              boxShadow: [BoxShadow(color: const Color(0xFF0B9B65).withOpacity(.13), blurRadius: 26, offset: const Offset(0, 12))],
+            ),
+            child: Stack(
+              children: [
+                Positioned(left: -38, top: -48, child: Container(width: 160, height: 160, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white.withOpacity(.08), width: 22)))),
+                Positioned(left: 48, bottom: -75, child: Container(width: 130, height: 130, decoration: BoxDecoration(shape: BoxShape.circle, color: gold.withOpacity(.06)))),
+                Padding(
+                  padding: const EdgeInsets.all(21),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+                        decoration: BoxDecoration(color: Colors.black.withOpacity(.16), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white12)),
+                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(Icons.auto_awesome, size: 14, color: Color(0xFFE8D9A0)),
+                          SizedBox(width: 6),
+                          Text('رحلتك تبدأ من هنا', style: TextStyle(color: Color(0xFFE8D9A0), fontSize: 11, fontWeight: FontWeight.bold)),
+                        ]),
+                      ),
+                      const SizedBox(height: 15),
+                      const Text('مرحباً بك! 👋', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 5),
+                      const Text('اكتشف، فكّر، العب، وتعلّم شيئاً جديداً كل يوم.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 13)),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _StatTile(icon: Icons.stars_rounded, label: 'رصيدك', value: '$points نقطة'),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _StatTile(icon: Icons.workspace_premium_rounded, label: 'مستواك', value: levelName),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          const Expanded(child: Text('تقدمك للمستوى التالي', style: TextStyle(color: Colors.white70, fontSize: 11))),
+                          Text(level == 4 ? 'وصلت للقمة!' : '${(progress * 100).round()}%', style: const TextStyle(color: Color(0xFFE8D9A0), fontWeight: FontWeight.bold, fontSize: 11)),
+                        ],
+                      ),
+                      const SizedBox(height: 7),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: LinearProgressIndicator(value: progress, minHeight: 8, color: const Color(0xFFE8D9A0), backgroundColor: Colors.black.withOpacity(.2)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          Row(
+            children: [
+              const Expanded(child: Text('ماذا تريد أن تفعل؟', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900))),
+              Text('اختر واستمتع', style: TextStyle(color: Colors.white.withOpacity(.48), fontSize: 11)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 11,
+            mainAxisSpacing: 11,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 1.18,
+            children: [
+              _FeatureCard(title: 'الألعاب والاختبارات', subtitle: 'ألغاز وأسئلة وذكاء', icon: Icons.extension_rounded, colors: const [Color(0xFF17664B), Color(0xFF103B2C)], onTap: () => go(1)),
+              _FeatureCard(title: 'تحدي اليوم', subtitle: 'مهمة جديدة كل يوم', icon: Icons.bolt_rounded, colors: const [Color(0xFF76551D), Color(0xFF3F3219)], onTap: () => go(2)),
+              _FeatureCard(title: 'عبارات ملهمة', subtitle: 'كلمات تحفظها وتشاركها', icon: Icons.format_quote_rounded, colors: const [Color(0xFF354D83), Color(0xFF202E50)], onTap: () => go(3)),
+              _FeatureCard(title: 'الأدوات الذكية', subtitle: 'حاسبات وأدوات مفيدة', icon: Icons.auto_awesome_rounded, colors: const [Color(0xFF69406F), Color(0xFF3E294B)], onTap: () => go(4)),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(.045),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withOpacity(.08)),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.lightbulb_outline_rounded, color: Color(0xFFE8D9A0), size: 27),
+                SizedBox(width: 12),
+                Expanded(child: Text('كل يوم فرصة لتتعلم شيئاً جديداً. استمتع برحلتك ولا تتوقف عن الاكتشاف!', style: TextStyle(color: Colors.white70, height: 1.55, fontSize: 12))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 13),
+          const Center(child: Text('صُمّم ليكون وقتك أجمل ✦ ALQOUD TOOLS', style: TextStyle(color: Colors.white30, fontSize: 10))),
+        ],
+      ),
+    );
+  }
 }
-Widget _menuCard(String title, String subtitle, IconData icon, VoidCallback action) => Card(
-  child: ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-    leading: CircleAvatar(backgroundColor: gold.withOpacity(.15), child: Icon(icon, color: gold)),
-    title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-    subtitle: Text(subtitle),
-    trailing: const Icon(Icons.arrow_back_ios_new, color: gold, size: 16),
-    onTap: action,
-  ),
-);
+
+class _StatTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  const _StatTile({required this.icon, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+    decoration: BoxDecoration(color: Colors.black.withOpacity(.16), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(.09))),
+    child: Row(children: [
+      Icon(icon, color: const Color(0xFFE8D9A0), size: 22),
+      const SizedBox(width: 8),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: const TextStyle(color: Colors.white60, fontSize: 10)),
+        const SizedBox(height: 3),
+        Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+      ])),
+    ]),
+  );
+}
+
+class _FeatureCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final List<Color> colors;
+  final VoidCallback onTap;
+  const _FeatureCard({required this.title, required this.subtitle, required this.icon, required this.colors, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(21),
+      onTap: onTap,
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: colors, begin: Alignment.topRight, end: Alignment.bottomLeft),
+          borderRadius: BorderRadius.circular(21),
+          border: Border.all(color: Colors.white.withOpacity(.10)),
+          boxShadow: [BoxShadow(color: colors.first.withOpacity(.16), blurRadius: 14, offset: const Offset(0, 6))],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 43,
+                height: 43,
+                decoration: BoxDecoration(color: Colors.white.withOpacity(.12), borderRadius: BorderRadius.circular(14)),
+                child: Icon(icon, color: const Color(0xFFFFE8A2), size: 25),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14)),
+                  const SizedBox(height: 4),
+                  Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
 class ToolsPage extends StatefulWidget {
   const ToolsPage({super.key});
   @override
