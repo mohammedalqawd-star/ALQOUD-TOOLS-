@@ -319,6 +319,44 @@ List<Q> _stageQuestionsFromPairs(List<(String, String)> pairs, int seed) {
   });
 }
 
+// Build a different deterministic set for every stage. Difficulty rises in four bands.
+List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
+  if (bank.isEmpty) return const <Q>[];
+  final random = math.Random(stage * 7919 + key.length * 101);
+  final indices = List<int>.generate(bank.length, (i) => i)..shuffle(random);
+  final count = math.min(10, bank.length);
+  final start = ((stage - 1) * 10) % bank.length;
+  final tier = (stage - 1) ~/ 250;
+  final result = <Q>[];
+  for (var i = 0; i < count; i++) {
+    final sourceIndex = indices[(start + i) % indices.length];
+    final original = bank[sourceIndex];
+    final choices = List<String>.from(original.choices);
+    final correctText = choices[original.answer];
+    choices.shuffle(math.Random(stage * 104729 + i * 97));
+    final prefix = switch (tier) {
+      0 => 'تحدي تأسيسي: ',
+      1 => 'تحدي متقدم: حلّل السؤال ثم أجب: ',
+      2 => 'تحدي خبير: انتبه للتفاصيل واستبعد الخيارات المتشابهة: ',
+      _ => 'تحدي المحترفين: اختر الإجابة الأدق بعد التفكير في جميع الاحتمالات: ',
+    };
+    result.add(Q(prefix + original.text, choices, choices.indexOf(correctText)));
+  }
+  var variant = 0;
+  while (result.length < 10) {
+    final original = bank[(start + variant) % bank.length];
+    final choices = List<String>.from(original.choices);
+    final correctText = choices[original.answer];
+    choices.shuffle(math.Random(stage * 65537 + variant * 131));
+    final wording = variant.isEven
+        ? 'صيغة إضافية: ما الإجابة الصحيحة للسؤال التالي؟ '
+        : 'اختبر فهمك: حدّد الاختيار المطابق للمعنى: ';
+    result.add(Q(wording + original.text, choices, choices.indexOf(correctText)));
+    variant++;
+  }
+  return result;
+}
+
 List<Q> riddleStageQuestions() => _stageQuestionsFromPairs(
   riddles.map((r) => ('${r.question} (اختر الحل الصحيح)', r.answer)).toList(), 311);
 List<Q> wordStageQuestions() => _stageQuestionsFromPairs(
@@ -440,7 +478,7 @@ class _StageLevelsPageState extends State<StageLevelsPage> {
     if (stage != completed + 1 || stage > totalStages) return;
     await Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(
       title: '${widget.title} • المرحلة $stage',
-      questions: widget.questions,
+      questions: _questionsForStage(widget.questions, stage, widget.stageKey),
       levelKey: widget.stageKey,
       stageNumber: stage,
       onEarn: widget.onEarn,
@@ -737,6 +775,15 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
   }
   Future<void> next() async {
     if (index == order.length - 1) {
+      if (widget.stageNumber != null && score < order.length * 10) {
+        if (mounted) setState(() {
+          index = 0;
+          score = 0;
+          selected = null;
+          feedback = 'لم تُكمل كل الإجابات بشكل صحيح. أعد المرحلة لتحصل على القفل والانتقال للمرحلة التالية.';
+        });
+        return;
+      }
       if (widget.stageNumber != null) {
         final prefs = await SharedPreferences.getInstance();
         final completed = prefs.getInt('completed_${widget.levelKey}') ?? 0;
