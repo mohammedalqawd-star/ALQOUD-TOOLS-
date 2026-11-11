@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'entertainment.dart';
+import 'quotes_page.dart';
 
 const gold = Color(0xFFC9A227);
 const green = Color(0xFF073B2B);
@@ -149,7 +150,7 @@ class _HomePageState extends State<HomePage> {
       _Dashboard(points: points, go: (i) => setState(() => tab = i)),
       GamesHubPage(onEarn: addPoints),
       ChallengesPage(onEarn: addPoints),
-      const QuotesPage(),
+      const QuoteLibraryPage(),
       const ToolsPage(),
     ];
     return Directionality(
@@ -234,6 +235,7 @@ class ToolsPage extends StatefulWidget {
 }
 class _ToolsPageState extends State<ToolsPage> {
   bool reminderEnabled = false;
+  bool soundEnabled = true;
 
   Future<void> _enableReminder() async {
     try {
@@ -259,6 +261,22 @@ class _ToolsPageState extends State<ToolsPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadSoundSetting();
+  }
+
+  Future<void> _loadSoundSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => soundEnabled = prefs.getBool('sound_enabled') ?? true);
+  }
+
+  Future<void> _changeSound(bool value) async {
+    await AppFeedback.setEnabled(value);
+    if (mounted) setState(() => soundEnabled = value);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final tools = <(String, IconData, Widget)>[
       ('حاسبة الأرباح', Icons.trending_up, const ProfitPage()),
@@ -270,6 +288,16 @@ class _ToolsPageState extends State<ToolsPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('الأدوات والحاسبات')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
+        Card(
+          color: const Color(0xFF153D30),
+          child: SwitchListTile(
+            secondary: const Icon(Icons.volume_up_rounded, color: gold),
+            title: const Text('المؤثرات الصوتية'),
+            subtitle: const Text('أصوات هادئة عند فتح التطبيق والإجابة والإنجاز'),
+            value: soundEnabled,
+            onChanged: _changeSound,
+          ),
+        ),
         Card(
           color: const Color(0xFF153D30),
           child: SwitchListTile(
