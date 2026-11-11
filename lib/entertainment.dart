@@ -219,66 +219,54 @@ const hard = <Q>[
 class QuizLevelsPage extends StatelessWidget {
   final Future<void> Function(int) onEarn;
   const QuizLevelsPage({super.key, required this.onEarn});
+
   @override
   Widget build(BuildContext context) {
-    final levels = [
-      ['سهل','ابدأ بالإحماء',Icons.sentiment_satisfied,easy,Color(0xFF48B887)],
-      ['متوسط','اختبر معلوماتك',Icons.psychology,medium,Color(0xFFE0B84F)],
-      ['صعب','تحدَّ معلوماتك',Icons.local_fire_department,hard,Color(0xFFE47A58)],
+    final cards = <_SquareGameCard>[
+      _SquareGameCard(title: 'المستوى السهل', subtitle: 'ابدأ بالإحماء', icon: Icons.sentiment_satisfied_alt_rounded, color: const Color(0xFF48B887), tag: 'سهل', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار سهل', questions: easy, levelKey: 'سهل', onEarn: onEarn)))),
+      _SquareGameCard(title: 'المستوى المتوسط', subtitle: 'اختبر معلوماتك', icon: Icons.psychology_rounded, color: const Color(0xFFE0B84F), tag: 'متوسط', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار متوسط', questions: medium, levelKey: 'متوسط', onEarn: onEarn)))),
+      _SquareGameCard(title: 'المستوى الصعب', subtitle: 'تحدَّ قدراتك', icon: Icons.local_fire_department_rounded, color: const Color(0xFFE47A58), tag: 'صعب', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار صعب', questions: hard, levelKey: 'صعب', onEarn: onEarn)))),
+      _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'مسائل تتولد بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'بنك الأسئلة', subtitle: '1200 مسألة حسابية', icon: Icons.library_books_rounded, color: const Color(0xFF83B7FF), tag: 'بنك', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn)))),
+      _SquareGameCard(title: 'اختبار اليوم', subtitle: '10 أسئلة جديدة', icon: Icons.today_rounded, color: const Color(0xFFD7B8FF), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
     ];
-    return Scaffold(backgroundColor: const Color(0xFF251B3D), 
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF251B3D),
       appBar: AppBar(backgroundColor: const Color(0xFF49316E), foregroundColor: const Color(0xFFD7B8FF), title: const Text('مستويات الاختبار')),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
-        const Text('كل إجابة صحيحة تمنحك 10 نقاط لأول مرة.', style: TextStyle(color: gold)),
-        const SizedBox(height: 12),
-        Card(
-          color: const Color(0xFF183C30),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            leading: const CircleAvatar(backgroundColor: Color(0x3348B887), child: Icon(Icons.all_inclusive, color: Color(0xFF48B887), size: 30)),
-            title: const Text('التحدي المفتوح • أسئلة متجددة', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('العب بلا حدّ للجولات مع مسائل تتولد تلقائياً'),
-            trailing: const Icon(Icons.play_circle_fill, color: gold, size: 30),
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn))),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(19),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(23),
+              gradient: const LinearGradient(colors: [Color(0xFF65449A), Color(0xFF2A2145)], begin: Alignment.topRight, end: Alignment.bottomLeft),
+              border: Border.all(color: const Color(0xFFD7B8FF).withOpacity(.4)),
+            ),
+            child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('مركز الاختبارات', style: TextStyle(color: Color(0xFFE9D9FF), fontSize: 23, fontWeight: FontWeight.w900)),
+              SizedBox(height: 7),
+              Text('اختر مستوى يناسبك أو ادخل التحدي المفتوح. كل إجابة صحيحة تمنحك 10 نقاط لأول مرة.', style: TextStyle(color: Colors.white70, height: 1.55, fontSize: 12)),
+            ]),
           ),
-        ),
-        const SizedBox(height: 12),
-        Card(color: const Color(0xFF203B59), child: ListTile(
-          leading: const Icon(Icons.library_books_rounded, color: Color(0xFF83B7FF)),
-          title: const Text('بنك الأسئلة الحسابية المتجدد'),
-          subtitle: const Text('1200 مسألة محفوظة، أو العب في التحدي المفتوح بلا نهاية'),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn))),
-        )),
-        const SizedBox(height: 12),
-        Card(color: const Color(0xFF49316E), child: ListTile(
-          leading: const Icon(Icons.today_rounded, color: Color(0xFFD7B8FF), size: 30),
-          title: const Text('اختبار اليوم • 10 أسئلة', style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: const Text('تحدٍّ جديد يتغير تلقائياً كل يوم'),
-          trailing: const Icon(Icons.play_circle_fill, color: Color(0xFFD7B8FF)),
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(
-              title: 'اختبار اليوم',
-              questions: generatedQuestionBank(),
-              levelKey: 'daily_1200_pool',
-              questionLimit: 10,
-              onEarn: onEarn,
-            )));
-          },
-        )),
-        const SizedBox(height: 12),
-        ...levels.map((l) => Card(color: panel, child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: CircleAvatar(backgroundColor: (l[4] as Color).withOpacity(.18), child: Icon(l[2] as IconData, color: l[4] as Color)),
-          title: Text(l[0] as String, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-          subtitle: Text((l[1] as String) + ' • 10 أسئلة'),
-          trailing: const Icon(Icons.play_circle_fill, color: gold, size: 30),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار ' + (l[0] as String), questions: l[3] as List<Q>, levelKey: l[0] as String, onEarn: onEarn))),
-        ))),
-      ]),
+          const SizedBox(height: 20),
+          const Text('اختر نمط التحدي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: .94,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: cards,
+          ),
+        ],
+      ),
     );
   }
 }
-
 
 class EndlessQuizPage extends StatefulWidget {
   final Future<void> Function(int) onEarn;
