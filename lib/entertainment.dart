@@ -69,7 +69,7 @@ class GamesHubPage extends StatelessWidget {
       _SquareGameCard(title: 'تحدي الحروف', subtitle: 'رتب الحروف واكتشف الكلمة', icon: Icons.abc_rounded, color: const Color(0xFF82B8FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'letters', title: 'تحدي الحروف', accent: const Color(0xFF82B8FF), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الوصف', subtitle: 'اكتشف الشيء من أوصافه', icon: Icons.search_rounded, color: const Color(0xFF8DD17E), tag: 'تخمين', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'description', title: 'تحدي الوصف', accent: const Color(0xFF8DD17E), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الحسابات', subtitle: 'مسائل تتدرج في الصعوبة', icon: Icons.calculate_rounded, color: const Color(0xFF69B7E8), tag: 'حساب', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
-      _SquareGameCard(title: 'تحدي 60 ثانية', subtitle: 'كم إجابة تجمع؟', icon: Icons.timer_rounded, color: const Color(0xFFFF8A65), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي اليوم', subtitle: 'مهمة متجددة كل يوم', icon: Icons.calendar_today_rounded, color: const Color(0xFF5BC7B1), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DailyChallengePage(onEarn: onEarn)))),
     ];
 
     return Scaffold(
@@ -125,6 +125,64 @@ class GamesHubPage extends StatelessWidget {
   }
 }
 
+class DailyChallengePage extends StatelessWidget {
+  final Future<void> Function(int) onEarn;
+  const DailyChallengePage({super.key, required this.onEarn});
+
+  @override
+  Widget build(BuildContext context) {
+    final day = DateTime.now().difference(DateTime(2025, 1, 1)).inDays;
+    const tasks = <(String, String, Color)>[
+      ('laugh', 'تحدي الضحك', Color(0xFFFFB74D)),
+      ('imagination', 'تحدي الخيال', Color(0xFFBA9BFF)),
+      ('speed', 'تحدي السرعة', Color(0xFFFF8066)),
+      ('compliment', 'تحدي المجاملة', Color(0xFFFF8EBA)),
+      ('focus', 'تحدي التركيز', Color(0xFF62D6C5)),
+      ('letters', 'تحدي الحروف', Color(0xFF82B8FF)),
+      ('description', 'تحدي الوصف', Color(0xFF8DD17E)),
+      ('math', 'تحدي الحسابات', Color(0xFF69B7E8)),
+    ];
+    final task = tasks[day % tasks.length];
+    return Scaffold(
+      backgroundColor: const Color(0xFF101D35),
+      appBar: AppBar(title: const Text('تحدي اليوم'), backgroundColor: const Color(0xFF174B49)),
+      body: ListView(padding: const EdgeInsets.all(20), children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [Color(0xFF176B5C), Color(0xFF17263B)], begin: Alignment.topRight, end: Alignment.bottomLeft),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: task.$3.withOpacity(.7)),
+          ),
+          child: Column(children: [
+            Icon(Icons.today_rounded, color: task.$3, size: 48),
+            const SizedBox(height: 14),
+            const Text('مهمتك لهذا اليوم', style: TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text(task.$2, textAlign: TextAlign.center, style: TextStyle(color: task.$3, fontSize: 25, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 10),
+            const Text('يتغير التحدي تلقائياً مع بداية يوم جديد. أكمل المهمة لتحصل على نقاط الإنجاز.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white70, height: 1.6)),
+          ]),
+        ),
+        const SizedBox(height: 18),
+        FilledButton.icon(
+          style: FilledButton.styleFrom(backgroundColor: task.$3, foregroundColor: const Color(0xFF17202B), padding: const EdgeInsets.symmetric(vertical: 15)),
+          onPressed: () {
+            final Widget page = task.$1 == 'speed'
+              ? SpeedChallengePage(onEarn: onEarn)
+              : MiniChallengePage(kind: task.$1, title: task.$2, accent: task.$3, onEarn: onEarn);
+            Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+          },
+          icon: const Icon(Icons.play_arrow_rounded),
+          label: const Text('ابدأ تحدي اليوم', style: TextStyle(fontWeight: FontWeight.w900)),
+        ),
+        const SizedBox(height: 12),
+        const Text('التحديات الثمانية تتناوب: الضحك، الخيال، السرعة، المجاملة، التركيز، الحروف، الوصف والحسابات.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white54, fontSize: 12, height: 1.6)),
+      ]),
+    );
+  }
+}
+
 class MiniChallengePage extends StatefulWidget {
   final String kind, title;
   final Color accent;
@@ -143,6 +201,13 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
     ('ماذا قال القلم للدفتر؟','أنت تفتح لي مجالاً للكتابة!'),
     ('لماذا لا يضيع الحاسوب؟','لأنه دائماً يعرف عنوانه!'),
     ('ما الشيء الذي يضحك بلا فم؟','النكتة عندما يسمعها الجميع!'),
+    ('لماذا أخذت الساعة إجازة؟','لأنها تعبت من عدّ اللحظات!'),
+    ('ماذا قال الكمبيوتر للإنترنت؟','أنت توسّع شبكة معارفي!'),
+    ('لماذا يحب الكتاب الهدوء؟','حتى لا تضيع منه الأفكار بين الصفحات!'),
+    ('ما أسرع شيء في الفصل؟','الخبر عندما يقول المعلم: عندنا اختبار!'),
+    ('لماذا ذهب المصباح إلى المدرسة؟','ليصبح أكثر إشراقاً في العلم!'),
+    ('ماذا قالت الممحاة للقلم؟','أصلح أخطاءك ولا تقلق!'),
+    ('لماذا لا يتشاجر التقويم؟','لأنه يحاول أن يجعل أيامه معدودة!'),
   ];
   static const _compliments = <String>[
     'أفكارك جميلة وتستحق أن تُسمع.',
@@ -150,11 +215,20 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
     'اجتهادك اليوم خطوة تستحق التقدير.',
     'وجودك الإيجابي يجعل العمل الجماعي أسهل.',
     'شكراً لك على تعاونك واحترامك.',
+    'لديك طريقة جميلة في جعل الأمور أوضح.',
+    'استمرارك في المحاولة دليل على عزيمتك.',
+    'أقدّر احترامك للوقت والجهد.',
+    'كلماتك الطيبة تصنع فرقاً جميلاً.',
+    'تعاملك الراقي يستحق الشكر.',
+    'كل تقدم تحققه يستحق أن تفخر به.',
+    'أنت تضيف للفريق روح التعاون.',
   ];
   static const _letterWords = <(String, String)>[
     ('ةسردم','مدرسة'), ('باتك','كتاب'), ('ةقيدح','حديقة'),
     ('ةرايس','سيارة'), ('بوساح','حاسوب'), ('ةمجن','نجمة'),
-    ('رحب','بحر'), ('ةمسب','بسمة'),
+    ('رحب','بحر'), ('ةمسب','بسمة'), ('ةذفان','نافذة'), ('ةرجش','شجرة'),
+    ('حاتفم','مفتاح'), ('ةعاس','ساعة'), ('ةسردم','مدرسة'), ('قيدص','صديق'),
+    ('ةلحر','رحلة'), ('ةمكح','حكمة'), ('ةقيدح','حديقة'), ('ةرك','كرة'),
   ];
   static const _descriptions = <(String, String)>[
     ('له أوراق وليس نباتاً، ونقرأ ما بداخله.','كتاب'),
@@ -163,6 +237,14 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
     ('نستخدمه لفتح الأبواب المغلقة.','مفتاح'),
     ('وسيلة نقل تطير في السماء.','طائرة'),
     ('نكتب به على الورق وله حبر.','قلم'),
+    ('نستخدمه لمعرفة الاتجاهات الأربعة.','بوصلة'),
+    ('يحفظ الطعام بارداً في المنزل.','ثلاجة'),
+    ('نسمع منه الأخبار والأغاني.','راديو'),
+    ('يظهر بعد المطر أحياناً بألوان متعددة.','قوس قزح'),
+    ('نزرع فيه الأزهار والخضروات.','تراب'),
+    ('يحمل المسافرين بين المدن على قضبان.','قطار'),
+    ('نراه في السماء نهاراً ويمنحنا الضوء.','الشمس'),
+    ('نستعمله لقياس درجة الحرارة.','ميزان حرارة'),
   ];
   @override
   void initState() { super.initState(); _newTask(); }
@@ -171,14 +253,19 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
     if (widget.kind == 'laugh') {
       final item = _jokes[rnd.nextInt(_jokes.length)]; prompt = item.$1; answer = item.$2; extra = 'اقرأ الموقف واكشف نهايته الطريفة.';
     } else if (widget.kind == 'imagination') {
-      const prompts = ['تخيل أنك اكتشفت جزيرة جديدة؛ ما الاسم الذي ستختاره لها؟','لو استطعت ابتكار جهاز يساعد الناس، ماذا سيفعل؟','اكتب بداية قصة عن مدينة فوق السحاب.','تخيل يوماً بلا إنترنت؛ كيف ستقضي وقتك؟','اخترع اسماً لكوكب جديد وصفه بجملة.'];
+      const prompts = ['تخيل أنك اكتشفت جزيرة جديدة؛ ما الاسم الذي ستختاره لها؟','لو استطعت ابتكار جهاز يساعد الناس، ماذا سيفعل؟','اكتب بداية قصة عن مدينة فوق السحاب.','تخيل يوماً بلا إنترنت؛ كيف ستقضي وقتك؟','اخترع اسماً لكوكب جديد وصفه بجملة.','لو فتحت مكتبة للأحلام، ماذا ستضع على رفوفها؟','تخيل مدينة تعمل بالطاقة النظيفة؛ صف أجمل ما فيها.','اكتب نهاية مختلفة لقصة بطلها طفل فضولي.','لو استطعت تعلم مهارة جديدة في يوم واحد، ماذا تختار ولماذا؟','ابتكر لعبة جماعية لا تحتاج إلى أجهزة.','صف مكاناً هادئاً تتمنى زيارته.','اخترع روبوتاً يساعد كبار السن؛ ما مهمته؟'];
       prompt = prompts[rnd.nextInt(prompts.length)]; answer = ''; extra = 'لا توجد إجابة واحدة صحيحة؛ أطلق خيالك.';
     } else if (widget.kind == 'compliment') {
       prompt = _compliments[rnd.nextInt(_compliments.length)]; answer = prompt; extra = 'اختر عبارة لطيفة وانسخها لتشاركها باحترام.';
     } else if (widget.kind == 'focus') {
-      answer = List.generate(5, (_) => rnd.nextInt(10)).join(); prompt = answer; extra = 'احفظ الأرقام، ثم أخفها واكتبها بالترتيب الصحيح.'; revealed = true;
+      final length = 5 + (DateTime.now().day % 4); answer = List.generate(length, (_) => rnd.nextInt(10)).join(); prompt = answer; extra = 'احفظ الأرقام، ثم أخفها واكتبها بالترتيب الصحيح. عدد الأرقام: $length'; revealed = true;
     } else if (widget.kind == 'letters') {
       final item = _letterWords[rnd.nextInt(_letterWords.length)]; prompt = item.$1.split('').join('  '); answer = item.$2; extra = 'رتب الحروف لتكوين كلمة صحيحة.';
+    } else if (widget.kind == 'math') {
+      final a = 5 + rnd.nextInt(25), b = 2 + rnd.nextInt(18), op = rnd.nextInt(3);
+      final value = op == 0 ? a + b : op == 1 ? a - b : a * b;
+      prompt = 'احسب: $a ${op == 0 ? '+' : op == 1 ? '−' : '×'} $b = ؟'; answer = value.toString();
+      extra = 'مسألة حسابية جديدة. حاول الحل دون استخدام الآلة الحاسبة.';
     } else {
       final item = _descriptions[rnd.nextInt(_descriptions.length)]; prompt = item.$1; answer = item.$2; extra = 'اكتب اسم الشيء الذي تصفه الجملة.';
     }
@@ -213,7 +300,7 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [Icon(Icons.auto_awesome_rounded, color: widget.accent), const SizedBox(width: 8), Text('مهمة التحدي', style: TextStyle(color: widget.accent, fontWeight: FontWeight.w900))]),
           const SizedBox(height: 17),
-          Text(widget.kind == 'focus' && !revealed ? '• • • • •' : prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.6)),
+          Text(widget.kind == 'focus' && !revealed ? List.filled(answer.length, '•').join('  ') : prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.6)),
           const SizedBox(height: 12),
           Text(extra, style: const TextStyle(color: Colors.white70, height: 1.5)),
           if (widget.kind == 'laugh' && revealed && !completed) ...[
