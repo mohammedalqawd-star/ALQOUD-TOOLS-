@@ -15,49 +15,38 @@ class _Quote {
   const _Quote(this.text, this.category);
 }
 
-const _quotes = <_Quote>[
-  _Quote('ابدأ بما تستطيع، ومن حيث أنت، ولا تنتظر الظروف المثالية.', 'تحفيز'),
-  _Quote('كل خطوة ثابتة، مهما كانت صغيرة، تقرّبك من هدفك.', 'تحفيز'),
-  _Quote('اجعل أفعالك تتحدث عن طموحك.', 'تحفيز'),
-  _Quote('لا تجعل تأخر الوصول سبباً للتوقف عن السير.', 'تحفيز'),
-  _Quote('القوة أن تتعلم ثم تحاول من جديد.', 'تحفيز'),
-  _Quote('الأيام تصنعها القرارات الصغيرة المتكررة.', 'تحفيز'),
-  _Quote('ثق بقدرتك على التعلم، وامنح نفسك وقتاً كافياً.', 'تحفيز'),
-  _Quote('النجاح نتيجة عمل منظم وصبر طويل.', 'نجاح'),
-  _Quote('لا تقارن بدايتك بمنتصف طريق شخص آخر.', 'نجاح'),
-  _Quote('الإنجاز الحقيقي أن تصبح أفضل من نفسك بالأمس.', 'نجاح'),
-  _Quote('الفكرة الجيدة تحتاج إلى تنفيذ، لا إلى انتظار.', 'نجاح'),
-  _Quote('رتّب أولوياتك، فالوقت رأس مال لا يعود.', 'نجاح'),
-  _Quote('التعثر محطة للتعلم، وليس نهاية الطريق.', 'نجاح'),
-  _Quote('من أتقن عمله ترك أثراً يسبق اسمه.', 'نجاح'),
-  _Quote('الكلمة الطيبة تفتح أبواباً لا تفتحها القوة.', 'أخلاق'),
-  _Quote('عامل الناس بما تحب أن يعاملوك به.', 'أخلاق'),
-  _Quote('الاحترام يظهر في الحديث كما يظهر في الاختلاف.', 'أخلاق'),
-  _Quote('التواضع لا ينقص قدرك، بل يزيده.', 'أخلاق'),
-  _Quote('كن صادقاً؛ فالوضوح راحة للقلب والعقل.', 'أخلاق'),
-  _Quote('الوفاء أن تحفظ الود حتى في غياب أصحابه.', 'أخلاق'),
-  _Quote('أجمل المكاسب سمعة طيبة وأثر حسن.', 'أخلاق'),
-  _Quote('العقل الهادئ يرى خيارات أكثر.', 'حكمة'),
-  _Quote('ليس كل صمت ضعفاً، وليس كل كلام شجاعة.', 'حكمة'),
-  _Quote('استمع لتفهم، لا لتنتظر دورك في الكلام.', 'حكمة'),
-  _Quote('من عرف قدر وقته أحسن اختيار معاركه.', 'حكمة'),
-  _Quote('الرأي يتغير عندما تظهر معرفة أفضل.', 'حكمة'),
-  _Quote('الحكمة أن تعرف متى تبدأ ومتى تتوقف.', 'حكمة'),
-  _Quote('لا تحكم على كتاب من صفحة واحدة.', 'حكمة'),
-  _Quote('بعد العسر تتسع الطرق، فتمسّك بالأمل.', 'أمل'),
-  _Quote('قد يحمل الغد فرصة لم تكن في الحسبان.', 'أمل'),
-  _Quote('ابتسم للحياة، واصنع فيها سبباً جميلاً.', 'أمل'),
-  _Quote('الأمل لا يلغي الصعوبات، لكنه يمنحك سبباً للمحاولة.', 'أمل'),
-  _Quote('لا تفقد نورك بسبب يوم غائم.', 'أمل'),
-  _Quote('كل صباح بداية جديدة لمن يريد أن يتعلم.', 'أمل'),
-  _Quote('القلوب المطمئنة ترى النعمة في التفاصيل.', 'أمل'),
-  _Quote('العلم يفتح آفاقاً، والفضول يحافظ على اتساعها.', 'علم'),
-  _Quote('اسأل لتتعلم، وابحث لتتأكد، وجرّب لتفهم.', 'علم'),
-  _Quote('المعرفة التي تطبقها تصبح مهارة.', 'علم'),
-  _Quote('اقرأ قليلاً كل يوم، فالتراكم يصنع فرقاً.', 'علم'),
-  _Quote('لا تخجل من السؤال؛ فالسؤال بداية الفهم.', 'علم'),
-  _Quote('تعلم مهارة جديدة، فقد تصبح مفتاح فرصتك القادمة.', 'علم'),
-];
+List<_Quote> _buildQuoteLibrary() {
+  const categories = <String>['تحفيز','نجاح','حكمة','أخلاق','أمل','علم','صداقة','عائلة','عمل','سعادة'];
+  const topics = <String>['العمل','العلم','الصداقة','الحياة','الطموح','الوقت','المعرفة','الأخلاق','التجربة','المستقبل'];
+  const qualities = <String>['الجميل','الصادق','الهادئ','المنظم','النافع','المتجدد','الواعي','البسيط','الشجاع','المتوازن'];
+  const ideas = <String>['الخطوة الصغيرة تصنع فرقاً كبيراً','التعلم يفتح أبواباً جديدة','الصدق يبني ثقة تدوم','الصبر يساعد على رؤية الصورة كاملة','الاحترام يجعل الاختلاف أكثر جمالاً','الإنجاز يحتاج إلى عمل مستمر','التعاون يختصر الطريق','القراءة توسع أفق التفكير','النية الطيبة تمنح العمل معنى','الهدوء يساعد على اتخاذ قرار أفضل'];
+  const endings = <String>['مع الصبر','كل يوم','بخطوات ثابتة','بروح متفائلة','بنية صادقة','بهدوء وحكمة','مع احترام الآخرين','بالتعلم والتجربة','دون استعجال','بإتقان واهتمام'];
+  const openings = <String>['ابدأ من','في طريق','تأمل','عند','مع','في ميدان','في','داخل','في عالم','من جمال'];
+  const bridges = <String>['وتذكر أن','ستجد أن','فلا تنس أن','اجعل يقينك أن','وتعلم أن','واعرف أن','وتأكد أن','واكتشف أن','وتذكر دائماً أن','واعلم أن'];
+  final topicsList = <String>[for (final x in topics) for (final y in qualities) '$x $y'];
+  final endingsList = <String>[for (final x in ideas) for (final y in endings) '$x $y'];
+  return List<_Quote>.generate(100000, (i) {
+    final c = i ~/ 10000;
+    final n = i % 10000;
+    final topic = topicsList[n ~/ 100];
+    final ending = endingsList[n % 100];
+    final opening = openings[c];
+    final bridge = bridges[c];
+    final text = switch (c) {
+      0 => '$opening $topic، $bridge $ending.',
+      1 => '$opening $topic، $ending.',
+      2 => '$opening $topic؛ $bridge $ending.',
+      3 => '$opening $topic، اجعل مبدأك أن $ending.',
+      4 => '$opening $topic، تذكر دائماً أن $ending.',
+      5 => '$opening $topic، $bridge $ending.',
+      6 => '$opening $topic، فالصديق الطيب يعرف أن $ending.',
+      7 => '$opening $topic، واجعل البيت مساحةً لـ$ending.',
+      8 => '$opening $topic، فالعمل المتقن يعني أن $ending.',
+      _ => '$opening $topic أن $ending.',
+    };
+    return _Quote(text, categories[c]);
+  });
+}
 
 class QuoteLibraryPage extends StatefulWidget {
   const QuoteLibraryPage({super.key});
@@ -71,6 +60,8 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
   Set<String> favorites = <String>{};
   Set<String> seenQuotes = <String>{};
   int dailyIndex = 0;
+  int visibleCount = 50;
+  late final List<_Quote> _quotes = _buildQuoteLibrary();
 
   @override
   void initState() {
@@ -93,6 +84,7 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
       favorites = (prefs.getStringList('favorite_quotes_v2') ?? []).toSet();
       seenQuotes = seen;
       dailyIndex = _quotes.indexOf(unseen[dayIndex]);
+      visibleCount = 50;
     });
   }
 
@@ -138,12 +130,13 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _quotes.where((q) {
+    final allFiltered = _quotes.where((q) {
       if (selected == 'المفضلة') return favorites.contains(q.text);
       if (seenQuotes.contains(q.text)) return false;
       if (selected == 'الكل') return true;
       return q.category == selected;
     }).toList();
+    final filtered = allFiltered.take(visibleCount).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -251,7 +244,7 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Spacer(),
-                Text('${filtered.length} عبارة', style: const TextStyle(color: Colors.white60, fontSize: 12)),
+                Text('${allFiltered.length} عبارة متاحة', style: const TextStyle(color: Colors.white60, fontSize: 12)),
               ],
             ),
             const SizedBox(height: 8),
@@ -265,6 +258,15 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
                     SizedBox(height: 8),
                     Text('لا توجد عبارات محفوظة بعد. اضغط علامة القلب على أي عبارة لإضافتها هنا.'),
                   ],
+                ),
+              ),
+            if (filtered.length < allFiltered.length)
+              Padding(
+                padding: const EdgeInsets.only(top: 8, bottom: 14),
+                child: OutlinedButton.icon(
+                  onPressed: () => setState(() => visibleCount = (visibleCount + 50).clamp(0, allFiltered.length).toInt()),
+                  icon: const Icon(Icons.expand_more_rounded),
+                  label: Text('عرض 50 عبارة إضافية • المتبقي ${allFiltered.length - filtered.length}'),
                 ),
               ),
             ...filtered.map((quote) {
