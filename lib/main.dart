@@ -133,6 +133,33 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int tab = 0;
   int points = 0;
+  final List<int> _tabHistory = [];
+
+  void _selectTab(int next) {
+    if (next == tab) return;
+    setState(() {
+      _tabHistory.remove(next);
+      _tabHistory.add(tab);
+      tab = next;
+    });
+  }
+
+  void _handleSystemBack() {
+    if (!mounted) return;
+    if (_tabHistory.isNotEmpty) {
+      setState(() => tab = _tabHistory.removeLast());
+    } else if (tab != 0) {
+      setState(() => tab = 0);
+    } else {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text('أنت في الصفحة الرئيسية. استخدم زر الرجوع للتنقل بين الأقسام.'),
+          duration: Duration(seconds: 2),
+        ));
+    }
+  }
+
   @override
   void initState() { super.initState(); _loadPoints(); }
   Future<void> _loadPoints() async {
@@ -148,7 +175,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final pages = [
-      _Dashboard(points: points, go: (i) => setState(() => tab = i)),
+      _Dashboard(points: points, go: _selectTab),
       GamesHubPage(onEarn: addPoints),
       ChallengesPage(onEarn: addPoints),
       const QuoteLibraryPage(),
@@ -156,20 +183,26 @@ class _HomePageState extends State<HomePage> {
     ];
     return Directionality(
       textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: SafeArea(child: IndexedStack(index: tab, children: pages)),
-        bottomNavigationBar: NavigationBar(
-          backgroundColor: [green, const Color(0xFF15566A), const Color(0xFF813C4A), const Color(0xFF49316E), const Color(0xFF183B63)][tab],
-          indicatorColor: Colors.white.withOpacity(.18),
-          selectedIndex: tab,
-          onDestinationSelected: (i) => setState(() => tab = i),
-          destinations: const [
-            NavigationDestination(icon: Icon(Icons.home_outlined), label: 'الرئيسية'),
-            NavigationDestination(icon: Icon(Icons.sports_esports_outlined), label: 'ألعاب'),
-            NavigationDestination(icon: Icon(Icons.today_outlined), label: 'اليومي'),
-            NavigationDestination(icon: Icon(Icons.format_quote), label: 'عبارات'),
-            NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
-          ],
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) _handleSystemBack();
+        },
+        child: Scaffold(
+          body: SafeArea(child: IndexedStack(index: tab, children: pages)),
+          bottomNavigationBar: NavigationBar(
+            backgroundColor: [green, const Color(0xFF15566A), const Color(0xFF813C4A), const Color(0xFF49316E), const Color(0xFF183B63)][tab],
+            indicatorColor: Colors.white.withOpacity(.18),
+            selectedIndex: tab,
+            onDestinationSelected: _selectTab,
+            destinations: const [
+              NavigationDestination(icon: Icon(Icons.home_outlined), label: 'الرئيسية'),
+              NavigationDestination(icon: Icon(Icons.sports_esports_outlined), label: 'ألعاب'),
+              NavigationDestination(icon: Icon(Icons.today_outlined), label: 'اليومي'),
+              NavigationDestination(icon: Icon(Icons.format_quote), label: 'عبارات'),
+              NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
+            ],
+          ),
         ),
       ),
     );
