@@ -61,12 +61,24 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
   Set<String> seenQuotes = <String>{};
   int dailyIndex = 0;
   int visibleCount = 50;
+  String freshQuote = '';
   late final List<_Quote> _quotes = _buildQuoteLibrary();
 
   @override
   void initState() {
     super.initState();
     _loadFavorites();
+  }
+
+  void _generateFreshQuote() {
+    const subjects = ['النجاح','العلم','الصبر','الوقت','الأمل','العمل','الصداقة','الأخلاق','الطموح','التجربة','المعرفة','التعاون','القراءة','الحياة','الاحترام','الإبداع','الإصرار','التفاؤل','الصدق','الحكمة'];
+    const actions = ['يبدأ بخطوة صغيرة','يكبر بالممارسة','يحتاج إلى نفس طويل','يزدهر مع التعلم','يصبح أجمل بالتعاون','يقوى بالصدق','يفتح أبواباً جديدة','يصنع فرقاً مع الأيام','يحتاج إلى قلب متفائل','يترك أثراً طيباً'];
+    const endings = ['فلا تستهن بالبدايات.','واجعل كل يوم فرصة جديدة.','وتذكر أن الاستمرار أهم من السرعة.','واختر دائماً ما ينفعك وينفع غيرك.','ولا تجعل التعثر نهاية الطريق.','وابنِ عاداتك على الهدوء والإتقان.','فالكلمة الطيبة والعمل الصالح يبقيان.','وتعلم من كل تجربة تمر بك.','وامنح أهدافك وقتاً وجهداً.','واجعل احترام الآخرين مبدأ ثابتاً.'];
+    final r = math.Random();
+    final subject = subjects[r.nextInt(subjects.length)];
+    final action = actions[r.nextInt(actions.length)];
+    final ending = endings[r.nextInt(endings.length)];
+    setState(() => freshQuote = '$subject $action، $ending');
   }
 
   Future<void> _loadFavorites() async {
@@ -145,6 +157,11 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
         title: const Text('مكتبة العبارات'),
         actions: [
           IconButton(
+            tooltip: 'ولّد عبارة جديدة',
+            onPressed: _generateFreshQuote,
+            icon: const Icon(Icons.auto_awesome_rounded),
+          ),
+          IconButton(
             tooltip: 'نسخ عبارة اليوم',
             onPressed: () => _copy(_quotes[dailyIndex].text),
             icon: const Icon(Icons.copy_all_outlined),
@@ -209,6 +226,28 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
                 ],
               ),
             ),
+            if (freshQuote.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(17),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF203B4A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: _gold.withOpacity(.7)),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  const Row(children: [Icon(Icons.auto_awesome_rounded, color: _gold), SizedBox(width: 8), Text('عبارت مولّدة حديثاً', style: TextStyle(color: _gold, fontWeight: FontWeight.bold))]),
+                  const SizedBox(height: 10),
+                  Text(freshQuote, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, height: 1.7, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  Wrap(alignment: WrapAlignment.center, spacing: 8, children: [
+                    TextButton.icon(onPressed: () => _copy(freshQuote), icon: const Icon(Icons.copy_rounded), label: const Text('نسخ')),
+                    TextButton.icon(onPressed: () => _toggleFavorite(freshQuote), icon: const Icon(Icons.favorite_border_rounded), label: const Text('حفظ')),
+                    TextButton.icon(onPressed: _generateFreshQuote, icon: const Icon(Icons.refresh_rounded), label: const Text('عبارة أخرى')),
+                  ]),
+                ]),
+              ),
+            ],
             const SizedBox(height: 20),
             const Text('اختر القسم', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
