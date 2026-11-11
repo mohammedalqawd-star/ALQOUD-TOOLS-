@@ -84,13 +84,13 @@ class GamesHubPage extends StatelessWidget {
               SizedBox(height: 12),
               Text('اختر لعبتك المفضلة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
               SizedBox(height: 6),
-              Text('ثمانية تحديات متنوعة؛ العب، اجمع النقاط، واكتشف مهارات جديدة.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 12)),
+              Text('تسعة تحديات متنوعة؛ العب، اجمع النقاط، واكتشف مهارات جديدة.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 12)),
             ]),
           ),
           const SizedBox(height: 22),
           Row(children: [
             const Expanded(child: Text('كل الألعاب', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900))),
-            Text('٨ تصنيفات', style: TextStyle(color: Colors.white.withOpacity(.55), fontSize: 11)),
+            Text('٩ تصنيفات', style: TextStyle(color: Colors.white.withOpacity(.55), fontSize: 11)),
           ]),
           const SizedBox(height: 12),
           GridView.count(
