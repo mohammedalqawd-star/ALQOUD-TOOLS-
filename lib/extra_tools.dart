@@ -391,8 +391,8 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
     final value = controller.text.trim();
     if (value.isEmpty) return;
     setState(() { notes.insert(0, value); controller.clear(); });
-    await _save();
     FocusScope.of(context).unfocus();
+    await _save();
   }
 
   Future<void> _delete(int index) async {
@@ -448,7 +448,7 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
           child: ListTile(
             title: Text(e.value, maxLines: 5, overflow: TextOverflow.ellipsis),
             leading: const Icon(Icons.notes_rounded, color: Color(0xFFD2A8F0)),
-            trailing: Wrap(mainAxisSize: MainAxisSize.min, children: [
+            trailing: Wrap(alignment: WrapAlignment.end, children: [
               IconButton(
                 tooltip: 'نسخ',
                 onPressed: () {
