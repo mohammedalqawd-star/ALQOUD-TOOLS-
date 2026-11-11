@@ -238,6 +238,7 @@ class _LedgerTotal extends StatelessWidget {
   );
 }
 
+
 class UnitConverterPage extends StatefulWidget {
   const UnitConverterPage({super.key});
   @override
@@ -283,7 +284,10 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
   }
 
   @override
-  void dispose() { input.dispose(); super.dispose(); }
+  void dispose() {
+    input.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -291,11 +295,18 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
     final result = _result;
     return Scaffold(
       backgroundColor: const Color(0xFF17243B),
-      appBar: AppBar(backgroundColor: const Color(0xFF244A78), foregroundColor: const Color(0xFFD7E8FF), title: const Text('محول الوحدات')),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF244A78),
+        foregroundColor: const Color(0xFFD7E8FF),
+        title: const Text('محول الوحدات'),
+      ),
       body: ListView(padding: const EdgeInsets.all(18), children: [
         Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF28649A), Color(0xFF243B66)]), borderRadius: BorderRadius.circular(23)),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [Color(0xFF28649A), Color(0xFF243B66)]),
+            borderRadius: BorderRadius.circular(23),
+          ),
           child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(Icons.swap_horiz_rounded, color: Color(0xFFB8DDFF), size: 38),
             SizedBox(height: 8),
@@ -305,7 +316,8 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
         ),
         const SizedBox(height: 18),
         DropdownButtonFormField<String>(
-          value: category,
+          key: ValueKey('category_$category'),
+          initialValue: category,
           decoration: const InputDecoration(labelText: 'نوع التحويل'),
           items: _units.keys.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
           onChanged: (v) => _changeCategory(v ?? category),
@@ -319,7 +331,8 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
         ),
         const SizedBox(height: 14),
         DropdownButtonFormField<String>(
-          value: from,
+          key: ValueKey('from_$category'),
+          initialValue: from,
           decoration: const InputDecoration(labelText: 'من وحدة'),
           items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
           onChanged: (v) => setState(() => from = v ?? from),
@@ -327,11 +340,16 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
         const SizedBox(height: 10),
         Center(child: IconButton.filledTonal(
           tooltip: 'تبديل الوحدتين',
-          onPressed: () => setState(() { final old = from; from = to; to = old; }),
+          onPressed: () => setState(() {
+            final old = from;
+            from = to;
+            to = old;
+          }),
           icon: const Icon(Icons.swap_vert_rounded),
         )),
         DropdownButtonFormField<String>(
-          value: to,
+          key: ValueKey('to_$category'),
+          initialValue: to,
           decoration: const InputDecoration(labelText: 'إلى وحدة'),
           items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
           onChanged: (v) => setState(() => to = v ?? to),
@@ -339,7 +357,11 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
         const SizedBox(height: 18),
         Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: const Color(0xFF203958), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF8BC8FF).withOpacity(.4))),
+          decoration: BoxDecoration(
+            color: const Color(0xFF203958),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFF8BC8FF).withOpacity(.4)),
+          ),
           child: Column(children: [
             const Text('النتيجة', style: TextStyle(color: Color(0xFFB8DDFF))),
             const SizedBox(height: 8),
@@ -349,10 +371,10 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFFD7E8FF)),
             ),
             const SizedBox(height: 5),
-            Text('$from  ←  $to', style: const TextStyle(color: Colors.white60)),
+            Text(from + '  ←  ' + to, style: const TextStyle(color: Colors.white60)),
             const SizedBox(height: 10),
             OutlinedButton.icon(
-              onPressed: result == null || !result.isFinite ? null : () => Clipboard.setData(ClipboardData(text: result.toString())),
+              onPressed: result == null || !result.isFinite ? null : () => Clipboard.setData(ClipboardData(text: _formatResult(result))),
               icon: const Icon(Icons.copy),
               label: const Text('نسخ النتيجة'),
             ),
@@ -375,7 +397,10 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
   final controller = TextEditingController();
 
   @override
-  void initState() { super.initState(); _load(); }
+  void initState() {
+    super.initState();
+    _load();
+  }
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -390,7 +415,10 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
   Future<void> _add() async {
     final value = controller.text.trim();
     if (value.isEmpty) return;
-    setState(() { notes.insert(0, value); controller.clear(); });
+    setState(() {
+      notes.insert(0, value);
+      controller.clear();
+    });
     FocusScope.of(context).unfocus();
     await _save();
   }
@@ -401,12 +429,19 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
   }
 
   @override
-  void dispose() { controller.dispose(); super.dispose(); }
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF30213B),
-    appBar: AppBar(backgroundColor: const Color(0xFF593D70), foregroundColor: const Color(0xFFF0D7FF), title: const Text('ملاحظاتي السريعة')),
+    appBar: AppBar(
+      backgroundColor: const Color(0xFF593D70),
+      foregroundColor: const Color(0xFFF0D7FF),
+      title: const Text('ملاحظاتي السريعة'),
+    ),
     body: ListView(padding: const EdgeInsets.all(16), children: [
       Container(
         padding: const EdgeInsets.all(16),
@@ -416,11 +451,17 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
             controller: controller,
             minLines: 2,
             maxLines: 5,
-            decoration: const InputDecoration(hintText: 'اكتب فكرة أو تذكيراً تريد الاحتفاظ به...', border: OutlineInputBorder()),
+            decoration: const InputDecoration(
+              hintText: 'اكتب فكرة أو تذكيراً تريد الاحتفاظ به...',
+              border: OutlineInputBorder(),
+            ),
           ),
           const SizedBox(height: 10),
           SizedBox(width: double.infinity, child: FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFD2A8F0), foregroundColor: const Color(0xFF30213B)),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFD2A8F0),
+              foregroundColor: const Color(0xFF30213B),
+            ),
             onPressed: _add,
             icon: const Icon(Icons.save_outlined),
             label: const Text('حفظ الملاحظة'),
@@ -430,7 +471,7 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
       const SizedBox(height: 18),
       Row(children: [
         const Expanded(child: Text('ملاحظاتك', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold))),
-        Text('${notes.length}', style: const TextStyle(color: Colors.white60)),
+        Text(notes.length.toString(), style: const TextStyle(color: Colors.white60)),
       ]),
       const SizedBox(height: 8),
       if (notes.isEmpty)
@@ -457,199 +498,11 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
                 },
                 icon: const Icon(Icons.copy_outlined),
               ),
-              IconButton(tooltip: 'حذف', onPressed: () => _delete(e.key), icon: const Icon(Icons.delete_outline)),
-            ]),
-          ),
-        )),
-      const SizedBox(height: 10),
-      const Text('ملاحظاتك محفوظة محلياً على الجهاز.', style: TextStyle(color: Colors.white54, fontSize: 11)),
-    ]),
-  );
-}
-), '').replaceFirst(RegExp(r'\\.
-    setState(() {
-      category = value;
-      from = _units[value]!.keys.first;
-      to = _units[value]!.keys.elementAt(1);
-    });
-  }
-
-  @override
-  void dispose() { input.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    final options = _units[category]!.keys.toList();
-    final result = _result;
-    return Scaffold(
-      backgroundColor: const Color(0xFF17243B),
-      appBar: AppBar(backgroundColor: const Color(0xFF244A78), foregroundColor: const Color(0xFFD7E8FF), title: const Text('محول الوحدات')),
-      body: ListView(padding: const EdgeInsets.all(18), children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF28649A), Color(0xFF243B66)]), borderRadius: BorderRadius.circular(23)),
-          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.swap_horiz_rounded, color: Color(0xFFB8DDFF), size: 38),
-            SizedBox(height: 8),
-            Text('حوّل وحداتك بسهولة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
-            Text('النتائج فورية وتعمل دون اتصال بالإنترنت.', style: TextStyle(color: Colors.white70)),
-          ]),
-        ),
-        const SizedBox(height: 18),
-        DropdownButtonFormField<String>(
-          value: category,
-          decoration: const InputDecoration(labelText: 'نوع التحويل'),
-          items: _units.keys.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => _changeCategory(v ?? category),
-        ),
-        const SizedBox(height: 14),
-        TextField(
-          controller: input,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-          onChanged: (_) => setState(() {}),
-          decoration: const InputDecoration(labelText: 'القيمة المراد تحويلها', prefixIcon: Icon(Icons.edit_outlined)),
-        ),
-        const SizedBox(height: 14),
-        DropdownButtonFormField<String>(
-          value: from,
-          decoration: const InputDecoration(labelText: 'من وحدة'),
-          items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => setState(() => from = v ?? from),
-        ),
-        const SizedBox(height: 10),
-        Center(child: IconButton.filledTonal(
-          tooltip: 'تبديل الوحدتين',
-          onPressed: () => setState(() { final old = from; from = to; to = old; }),
-          icon: const Icon(Icons.swap_vert_rounded),
-        )),
-        DropdownButtonFormField<String>(
-          value: to,
-          decoration: const InputDecoration(labelText: 'إلى وحدة'),
-          items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => setState(() => to = v ?? to),
-        ),
-        const SizedBox(height: 18),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: const Color(0xFF203958), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF8BC8FF).withOpacity(.4))),
-          child: Column(children: [
-            const Text('النتيجة', style: TextStyle(color: Color(0xFFB8DDFF))),
-            const SizedBox(height: 8),
-            SelectableText(
-              result == null || !result.isFinite ? 'أدخل قيمة صحيحة' : result.toStringAsPrecision(10).replaceFirst(RegExp(r'\\.?0+$'), ''),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFFD7E8FF)),
-            ),
-            const SizedBox(height: 5),
-            Text('$from  ←  $to', style: const TextStyle(color: Colors.white60)),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: result == null || !result.isFinite ? null : () => Clipboard.setData(ClipboardData(text: result.toString())),
-              icon: const Icon(Icons.copy),
-              label: const Text('نسخ النتيجة'),
-            ),
-          ]),
-        ),
-      ]),
-    );
-  }
-}
-
-class QuickNotesPage extends StatefulWidget {
-  const QuickNotesPage({super.key});
-  @override
-  State<QuickNotesPage> createState() => _QuickNotesPageState();
-}
-
-class _QuickNotesPageState extends State<QuickNotesPage> {
-  static const _key = 'alqoud_quick_notes';
-  List<String> notes = [];
-  final controller = TextEditingController();
-
-  @override
-  void initState() { super.initState(); _load(); }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() => notes = prefs.getStringList(_key) ?? []);
-  }
-
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, notes);
-  }
-
-  Future<void> _add() async {
-    final value = controller.text.trim();
-    if (value.isEmpty) return;
-    setState(() { notes.insert(0, value); controller.clear(); });
-    await _save();
-    FocusScope.of(context).unfocus();
-  }
-
-  Future<void> _delete(int index) async {
-    setState(() => notes.removeAt(index));
-    await _save();
-  }
-
-  @override
-  void dispose() { controller.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFF30213B),
-    appBar: AppBar(backgroundColor: const Color(0xFF593D70), foregroundColor: const Color(0xFFF0D7FF), title: const Text('ملاحظاتي السريعة')),
-    body: ListView(padding: const EdgeInsets.all(16), children: [
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: const Color(0xFF49345B), borderRadius: BorderRadius.circular(20)),
-        child: Column(children: [
-          TextField(
-            controller: controller,
-            minLines: 2,
-            maxLines: 5,
-            decoration: const InputDecoration(hintText: 'اكتب فكرة أو تذكيراً تريد الاحتفاظ به...', border: OutlineInputBorder()),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(width: double.infinity, child: FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFD2A8F0), foregroundColor: const Color(0xFF30213B)),
-            onPressed: _add,
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('حفظ الملاحظة'),
-          )),
-        ]),
-      ),
-      const SizedBox(height: 18),
-      Row(children: [
-        const Expanded(child: Text('ملاحظاتك', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold))),
-        Text('${notes.length}', style: const TextStyle(color: Colors.white60)),
-      ]),
-      const SizedBox(height: 8),
-      if (notes.isEmpty)
-        const Padding(
-          padding: EdgeInsets.all(25),
-          child: Column(children: [
-            Icon(Icons.sticky_note_2_outlined, size: 48, color: Color(0xFFD2A8F0)),
-            SizedBox(height: 8),
-            Text('لا توجد ملاحظات بعد', style: TextStyle(color: Colors.white70)),
-          ]),
-        )
-      else
-        ...notes.asMap().entries.map((e) => Card(
-          color: const Color(0xFF49345B),
-          child: ListTile(
-            title: Text(e.value, maxLines: 5, overflow: TextOverflow.ellipsis),
-            leading: const Icon(Icons.notes_rounded, color: Color(0xFFD2A8F0)),
-            trailing: Wrap(mainAxisSize: MainAxisSize.min, children: [
               IconButton(
-                tooltip: 'نسخ',
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: e.value));
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم نسخ الملاحظة')));
-                },
-                icon: const Icon(Icons.copy_outlined),
+                tooltip: 'حذف',
+                onPressed: () => _delete(e.key),
+                icon: const Icon(Icons.delete_outline),
               ),
-              IconButton(tooltip: 'حذف', onPressed: () => _delete(e.key), icon: const Icon(Icons.delete_outline)),
             ]),
           ),
         )),
@@ -658,201 +511,6 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
     ]),
   );
 }
-), '');
-
-  void _changeCategory(String value) {
-    setState(() {
-      category = value;
-      from = _units[value]!.keys.first;
-      to = _units[value]!.keys.elementAt(1);
-    });
-  }
-
-  @override
-  void dispose() { input.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) {
-    final options = _units[category]!.keys.toList();
-    final result = _result;
-    return Scaffold(
-      backgroundColor: const Color(0xFF17243B),
-      appBar: AppBar(backgroundColor: const Color(0xFF244A78), foregroundColor: const Color(0xFFD7E8FF), title: const Text('محول الوحدات')),
-      body: ListView(padding: const EdgeInsets.all(18), children: [
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF28649A), Color(0xFF243B66)]), borderRadius: BorderRadius.circular(23)),
-          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(Icons.swap_horiz_rounded, color: Color(0xFFB8DDFF), size: 38),
-            SizedBox(height: 8),
-            Text('حوّل وحداتك بسهولة', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
-            Text('النتائج فورية وتعمل دون اتصال بالإنترنت.', style: TextStyle(color: Colors.white70)),
-          ]),
-        ),
-        const SizedBox(height: 18),
-        DropdownButtonFormField<String>(
-          value: category,
-          decoration: const InputDecoration(labelText: 'نوع التحويل'),
-          items: _units.keys.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => _changeCategory(v ?? category),
-        ),
-        const SizedBox(height: 14),
-        TextField(
-          controller: input,
-          keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
-          onChanged: (_) => setState(() {}),
-          decoration: const InputDecoration(labelText: 'القيمة المراد تحويلها', prefixIcon: Icon(Icons.edit_outlined)),
-        ),
-        const SizedBox(height: 14),
-        DropdownButtonFormField<String>(
-          value: from,
-          decoration: const InputDecoration(labelText: 'من وحدة'),
-          items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => setState(() => from = v ?? from),
-        ),
-        const SizedBox(height: 10),
-        Center(child: IconButton.filledTonal(
-          tooltip: 'تبديل الوحدتين',
-          onPressed: () => setState(() { final old = from; from = to; to = old; }),
-          icon: const Icon(Icons.swap_vert_rounded),
-        )),
-        DropdownButtonFormField<String>(
-          value: to,
-          decoration: const InputDecoration(labelText: 'إلى وحدة'),
-          items: options.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-          onChanged: (v) => setState(() => to = v ?? to),
-        ),
-        const SizedBox(height: 18),
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: const Color(0xFF203958), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFF8BC8FF).withOpacity(.4))),
-          child: Column(children: [
-            const Text('النتيجة', style: TextStyle(color: Color(0xFFB8DDFF))),
-            const SizedBox(height: 8),
-            SelectableText(
-              result == null || !result.isFinite ? 'أدخل قيمة صحيحة' : result.toStringAsPrecision(10).replaceFirst(RegExp(r'\\.?0+$'), ''),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFFD7E8FF)),
-            ),
-            const SizedBox(height: 5),
-            Text('$from  ←  $to', style: const TextStyle(color: Colors.white60)),
-            const SizedBox(height: 10),
-            OutlinedButton.icon(
-              onPressed: result == null || !result.isFinite ? null : () => Clipboard.setData(ClipboardData(text: result.toString())),
-              icon: const Icon(Icons.copy),
-              label: const Text('نسخ النتيجة'),
-            ),
-          ]),
-        ),
-      ]),
-    );
-  }
-}
-
-class QuickNotesPage extends StatefulWidget {
-  const QuickNotesPage({super.key});
-  @override
-  State<QuickNotesPage> createState() => _QuickNotesPageState();
-}
-
-class _QuickNotesPageState extends State<QuickNotesPage> {
-  static const _key = 'alqoud_quick_notes';
-  List<String> notes = [];
-  final controller = TextEditingController();
-
-  @override
-  void initState() { super.initState(); _load(); }
-
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() => notes = prefs.getStringList(_key) ?? []);
-  }
-
-  Future<void> _save() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setStringList(_key, notes);
-  }
-
-  Future<void> _add() async {
-    final value = controller.text.trim();
-    if (value.isEmpty) return;
-    setState(() { notes.insert(0, value); controller.clear(); });
-    await _save();
-    FocusScope.of(context).unfocus();
-  }
-
-  Future<void> _delete(int index) async {
-    setState(() => notes.removeAt(index));
-    await _save();
-  }
-
-  @override
-  void dispose() { controller.dispose(); super.dispose(); }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFF30213B),
-    appBar: AppBar(backgroundColor: const Color(0xFF593D70), foregroundColor: const Color(0xFFF0D7FF), title: const Text('ملاحظاتي السريعة')),
-    body: ListView(padding: const EdgeInsets.all(16), children: [
-      Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: const Color(0xFF49345B), borderRadius: BorderRadius.circular(20)),
-        child: Column(children: [
-          TextField(
-            controller: controller,
-            minLines: 2,
-            maxLines: 5,
-            decoration: const InputDecoration(hintText: 'اكتب فكرة أو تذكيراً تريد الاحتفاظ به...', border: OutlineInputBorder()),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(width: double.infinity, child: FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFFD2A8F0), foregroundColor: const Color(0xFF30213B)),
-            onPressed: _add,
-            icon: const Icon(Icons.save_outlined),
-            label: const Text('حفظ الملاحظة'),
-          )),
-        ]),
-      ),
-      const SizedBox(height: 18),
-      Row(children: [
-        const Expanded(child: Text('ملاحظاتك', style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold))),
-        Text('${notes.length}', style: const TextStyle(color: Colors.white60)),
-      ]),
-      const SizedBox(height: 8),
-      if (notes.isEmpty)
-        const Padding(
-          padding: EdgeInsets.all(25),
-          child: Column(children: [
-            Icon(Icons.sticky_note_2_outlined, size: 48, color: Color(0xFFD2A8F0)),
-            SizedBox(height: 8),
-            Text('لا توجد ملاحظات بعد', style: TextStyle(color: Colors.white70)),
-          ]),
-        )
-      else
-        ...notes.asMap().entries.map((e) => Card(
-          color: const Color(0xFF49345B),
-          child: ListTile(
-            title: Text(e.value, maxLines: 5, overflow: TextOverflow.ellipsis),
-            leading: const Icon(Icons.notes_rounded, color: Color(0xFFD2A8F0)),
-            trailing: Wrap(mainAxisSize: MainAxisSize.min, children: [
-              IconButton(
-                tooltip: 'نسخ',
-                onPressed: () {
-                  Clipboard.setData(ClipboardData(text: e.value));
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم نسخ الملاحظة')));
-                },
-                icon: const Icon(Icons.copy_outlined),
-              ),
-              IconButton(tooltip: 'حذف', onPressed: () => _delete(e.key), icon: const Icon(Icons.delete_outline)),
-            ]),
-          ),
-        )),
-      const SizedBox(height: 10),
-      const Text('ملاحظاتك محفوظة محلياً على الجهاز.', style: TextStyle(color: Colors.white54, fontSize: 11)),
-    ]),
-  );
-}
-
 
 class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
@@ -867,8 +525,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
   int streak = 0;
   bool loading = true;
 
-  String _dateKey(DateTime date) =>
-      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  String _dateKey(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return date.year.toString() + '-' + month + '-' + day;
+  }
 
   @override
   void initState() {
@@ -882,11 +543,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
     final keys = prefs.getKeys();
     final days = keys.where((key) => key.startsWith('daily_done_') && prefs.getBool(key) == true).length;
     var cursor = DateTime.now();
-    if (!(prefs.getBool('daily_done_${_dateKey(cursor)}') ?? false)) {
+    if (!(prefs.getBool('daily_done_' + _dateKey(cursor)) ?? false)) {
       cursor = cursor.subtract(const Duration(days: 1));
     }
     var currentStreak = 0;
-    while (currentStreak < 3650 && (prefs.getBool('daily_done_${_dateKey(cursor)}') ?? false)) {
+    while (currentStreak < 3650 && (prefs.getBool('daily_done_' + _dateKey(cursor)) ?? false)) {
       currentStreak++;
       cursor = cursor.subtract(const Duration(days: 1));
     }
@@ -934,7 +595,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('رحلتك حتى الآن', style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 8),
-                  Text('$unlocked / ${badges.length} شارات مفتوحة', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                  Text(unlocked.toString() + ' / ' + badges.length.toString() + ' شارات مفتوحة', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 14),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
@@ -956,10 +617,10 @@ class _AchievementsPageState extends State<AchievementsPage> {
                 physics: const NeverScrollableScrollPhysics(),
                 childAspectRatio: 1.35,
                 children: [
-                  _AchievementStat(label: 'النقاط', value: '$points', icon: Icons.stars_rounded, color: const Color(0xFFFFD66E)),
-                  _AchievementStat(label: 'الأنشطة المكتملة', value: '$solvedActivities', icon: Icons.task_alt_rounded, color: const Color(0xFF8DE2C1)),
-                  _AchievementStat(label: 'أيام التحدي', value: '$completedDays', icon: Icons.event_available_rounded, color: const Color(0xFFFFA6C2)),
-                  _AchievementStat(label: 'السلسلة الحالية', value: '$streak يوم', icon: Icons.local_fire_department_rounded, color: const Color(0xFFFFB36D)),
+                  _AchievementStat(label: 'النقاط', value: points.toString(), icon: Icons.stars_rounded, color: const Color(0xFFFFD66E)),
+                  _AchievementStat(label: 'الأنشطة المكتملة', value: solvedActivities.toString(), icon: Icons.task_alt_rounded, color: const Color(0xFF8DE2C1)),
+                  _AchievementStat(label: 'أيام التحدي', value: completedDays.toString(), icon: Icons.event_available_rounded, color: const Color(0xFFFFA6C2)),
+                  _AchievementStat(label: 'السلسلة الحالية', value: streak.toString() + ' يوم', icon: Icons.local_fire_department_rounded, color: const Color(0xFFFFB36D)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -1001,7 +662,11 @@ class _AchievementStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(13),
-    decoration: BoxDecoration(color: const Color(0xFF303E56), borderRadius: BorderRadius.circular(18), border: Border.all(color: color.withOpacity(.2))),
+    decoration: BoxDecoration(
+      color: const Color(0xFF303E56),
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: color.withOpacity(.2)),
+    ),
     child: Row(children: [
       Icon(icon, color: color, size: 24),
       const SizedBox(width: 9),
