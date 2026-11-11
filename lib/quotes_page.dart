@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_feedback.dart';
 
-const _gold = Color(0xFFE3C36A);
-const _deep = Color(0xFF061A14);
-const _green = Color(0xFF0D4935);
-const _panel = Color(0xFF102B22);
+const _gold = Color(0xFFE2B8FF);
+const _deep = Color(0xFF17152B);
+const _green = Color(0xFF49316E);
+const _panel = Color(0xFF29233F);
 
 class _Quote {
   final String text;
@@ -117,6 +117,8 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF49316E),
+        foregroundColor: const Color(0xFFE2B8FF),
         title: const Text('مكتبة العبارات'),
         actions: [
           IconButton(
@@ -129,7 +131,7 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [_deep, Color(0xFF0A2A20), _deep],
+            colors: [_deep, Color(0xFF302347), _deep],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
@@ -141,7 +143,7 @@ class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF1B6247), Color(0xFF102B22), Color(0xFF624D20)],
+                  colors: [Color(0xFF60407E), Color(0xFF29233F), Color(0xFF3C315E)],
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                 ),
