@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'app_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'entertainment.dart';
 
@@ -72,6 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    AppFeedback.play(SoundCue.open);
     Future.delayed(const Duration(milliseconds: 2100), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -225,8 +227,37 @@ Widget _menuCard(String title, String subtitle, IconData icon, VoidCallback acti
     onTap: action,
   ),
 );
-class ToolsPage extends StatelessWidget {
+class ToolsPage extends StatefulWidget {
   const ToolsPage({super.key});
+  @override
+  State<ToolsPage> createState() => _ToolsPageState();
+}
+class _ToolsPageState extends State<ToolsPage> {
+  bool reminderEnabled = false;
+
+  Future<void> _enableReminder() async {
+    try {
+      final ok = await ReminderService.scheduleDaily();
+      if (!mounted) return;
+      setState(() => reminderEnabled = ok);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(ok
+            ? 'تم تفعيل التذكير اليومي الساعة 7 مساءً.'
+            : 'لم يتم منح إذن الإشعارات. فعّله من إعدادات الهاتف.'),
+      ));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تعذر تفعيل التذكير على هذا الجهاز.')),
+      );
+    }
+  }
+
+  Future<void> _disableReminder() async {
+    await ReminderService.cancelDaily();
+    if (mounted) setState(() => reminderEnabled = false);
+  }
+
   @override
   Widget build(BuildContext context) {
     final tools = <(String, IconData, Widget)>[
@@ -238,12 +269,24 @@ class ToolsPage extends StatelessWidget {
     ];
     return Scaffold(
       appBar: AppBar(title: const Text('الأدوات والحاسبات')),
-      body: ListView(padding: const EdgeInsets.all(16), children: tools.map((t) => Card(child: ListTile(
+      body: ListView(padding: const EdgeInsets.all(16), children: [
+        Card(
+          color: const Color(0xFF153D30),
+          child: SwitchListTile(
+            secondary: const Icon(Icons.notifications_active, color: gold),
+            title: const Text('التذكير اليومي'),
+            subtitle: const Text('إشعار يومي الساعة 7 مساءً لتجربة تحدٍ جديد'),
+            value: reminderEnabled,
+            onChanged: (value) => value ? _enableReminder() : _disableReminder(),
+          ),
+        ),
+        ...tools.map((t) => Card(child: ListTile(
         leading: Icon(t.$2, color: gold),
         title: Text(t.$1),
         trailing: const Icon(Icons.chevron_left),
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => t.$3)),
-      ))).toList()),
+      ))),
+      ]),
     );
   }
 }
