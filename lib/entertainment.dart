@@ -62,6 +62,15 @@ class GamesHubPage extends StatelessWidget {
       _SquareGameCard(title: 'معاني الكلمات', subtitle: 'وسّع مفرداتك', icon: Icons.menu_book_rounded, color: const Color(0xFF83B7FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي الضحك', subtitle: 'نكت خفيفة ومواقف طريفة', icon: Icons.sentiment_very_satisfied_rounded, color: const Color(0xFFFFB74D), tag: 'مرح', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'laugh', title: 'تحدي الضحك', accent: const Color(0xFFFFB74D), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي الخيال', subtitle: 'أطلق أفكارك واكتب حكايتك', icon: Icons.auto_awesome_rounded, color: const Color(0xFFBA9BFF), tag: 'إبداع', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'imagination', title: 'تحدي الخيال', accent: const Color(0xFFBA9BFF), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي السرعة', subtitle: '30 ثانية لاتخاذ القرار', icon: Icons.bolt_rounded, color: const Color(0xFFFF8066), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي المجاملة', subtitle: 'اختر كلمة طيبة وشاركها', icon: Icons.volunteer_activism_rounded, color: const Color(0xFFFF8EBA), tag: 'كلمات طيبة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'compliment', title: 'تحدي المجاملة', accent: const Color(0xFFFF8EBA), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي التركيز', subtitle: 'احفظ الرمز ثم اكتبه', icon: Icons.center_focus_strong_rounded, color: const Color(0xFF62D6C5), tag: 'تركيز', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'focus', title: 'تحدي التركيز', accent: const Color(0xFF62D6C5), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي الحروف', subtitle: 'رتب الحروف واكتشف الكلمة', icon: Icons.abc_rounded, color: const Color(0xFF82B8FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'letters', title: 'تحدي الحروف', accent: const Color(0xFF82B8FF), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي الوصف', subtitle: 'اكتشف الشيء من أوصافه', icon: Icons.search_rounded, color: const Color(0xFF8DD17E), tag: 'تخمين', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'description', title: 'تحدي الوصف', accent: const Color(0xFF8DD17E), onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي الحسابات', subtitle: 'مسائل تتدرج في الصعوبة', icon: Icons.calculate_rounded, color: const Color(0xFF69B7E8), tag: 'حساب', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة جديدة كل يوم', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () { final now = DateTime.now(); final key = 'daily_${now.year}_${now.month}_${now.day}'; Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: key, questionLimit: 10, onEarn: onEarn))); }),
       _SquareGameCard(title: 'تحدي 60 ثانية', subtitle: 'كم إجابة تجمع؟', icon: Icons.timer_rounded, color: const Color(0xFFFF8A65), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
     ];
 
@@ -84,13 +93,13 @@ class GamesHubPage extends StatelessWidget {
               SizedBox(height: 12),
               Text('اختر لعبتك المفضلة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
               SizedBox(height: 6),
-              Text('تسعة تحديات متنوعة؛ العب، اجمع النقاط، واكتشف مهارات جديدة.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 12)),
+              Text('تحديات متنوعة للمرح والخيال والتركيز والسرعة والمعرفة.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 12)),
             ]),
           ),
           const SizedBox(height: 22),
           Row(children: [
             const Expanded(child: Text('كل الألعاب', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900))),
-            Text('٩ تصنيفات', style: TextStyle(color: Colors.white.withOpacity(.55), fontSize: 11)),
+            Text('${cards.length} تحدياً', style: TextStyle(color: Colors.white.withOpacity(.55), fontSize: 11)),
           ]),
           const SizedBox(height: 12),
           GridView.count(
@@ -116,6 +125,125 @@ class GamesHubPage extends StatelessWidget {
       ),
     );
   }
+}
+
+class MiniChallengePage extends StatefulWidget {
+  final String kind, title;
+  final Color accent;
+  final Future<void> Function(int) onEarn;
+  const MiniChallengePage({super.key, required this.kind, required this.title, required this.accent, required this.onEarn});
+  @override
+  State<MiniChallengePage> createState() => _MiniChallengePageState();
+}
+class _MiniChallengePageState extends State<MiniChallengePage> {
+  final input = TextEditingController();
+  late String prompt, answer, extra;
+  bool revealed = true, completed = false, busy = false;
+  String message = '';
+  static const _jokes = <(String, String)>[
+    ('لماذا ذهب الكتاب إلى الطبيب؟','لأنه كان فيه صفحات متعبة!'),
+    ('ماذا قال القلم للدفتر؟','أنت تفتح لي مجالاً للكتابة!'),
+    ('لماذا لا يضيع الحاسوب؟','لأنه دائماً يعرف عنوانه!'),
+    ('ما الشيء الذي يضحك بلا فم؟','النكتة عندما يسمعها الجميع!'),
+  ];
+  static const _compliments = <String>[
+    'أفكارك جميلة وتستحق أن تُسمع.',
+    'أسلوبك في التعامل يترك أثراً طيباً.',
+    'اجتهادك اليوم خطوة تستحق التقدير.',
+    'وجودك الإيجابي يجعل العمل الجماعي أسهل.',
+    'شكراً لك على تعاونك واحترامك.',
+  ];
+  static const _letterWords = <(String, String)>[
+    ('ةسردم','مدرسة'), ('باتك','كتاب'), ('ةقيدح','حديقة'),
+    ('ةرايس','سيارة'), ('بوساح','حاسوب'), ('ةمجن','نجمة'),
+    ('رحب','بحر'), ('ةمسب','بسمة'),
+  ];
+  static const _descriptions = <(String, String)>[
+    ('له أوراق وليس نباتاً، ونقرأ ما بداخله.','كتاب'),
+    ('نراه في السماء ليلاً ويعكس ضوء الشمس.','القمر'),
+    ('له عقارب أو شاشة ويخبرنا بالوقت.','ساعة'),
+    ('نستخدمه لفتح الأبواب المغلقة.','مفتاح'),
+    ('وسيلة نقل تطير في السماء.','طائرة'),
+    ('نكتب به على الورق وله حبر.','قلم'),
+  ];
+  @override
+  void initState() { super.initState(); _newTask(); }
+  void _newTask() {
+    final rnd = math.Random(DateTime.now().millisecondsSinceEpoch);
+    if (widget.kind == 'laugh') {
+      final item = _jokes[rnd.nextInt(_jokes.length)]; prompt = item.$1; answer = item.$2; extra = 'اقرأ الموقف واكشف نهايته الطريفة.';
+    } else if (widget.kind == 'imagination') {
+      const prompts = ['تخيل أنك اكتشفت جزيرة جديدة؛ ما الاسم الذي ستختاره لها؟','لو استطعت ابتكار جهاز يساعد الناس، ماذا سيفعل؟','اكتب بداية قصة عن مدينة فوق السحاب.','تخيل يوماً بلا إنترنت؛ كيف ستقضي وقتك؟','اخترع اسماً لكوكب جديد وصفه بجملة.'];
+      prompt = prompts[rnd.nextInt(prompts.length)]; answer = ''; extra = 'لا توجد إجابة واحدة صحيحة؛ أطلق خيالك.';
+    } else if (widget.kind == 'compliment') {
+      prompt = _compliments[rnd.nextInt(_compliments.length)]; answer = prompt; extra = 'اختر عبارة لطيفة وانسخها لتشاركها باحترام.';
+    } else if (widget.kind == 'focus') {
+      answer = List.generate(5, (_) => rnd.nextInt(10)).join(); prompt = answer; extra = 'احفظ الأرقام، ثم أخفها واكتبها بالترتيب الصحيح.'; revealed = true;
+    } else if (widget.kind == 'letters') {
+      final item = _letterWords[rnd.nextInt(_letterWords.length)]; prompt = item.$1.split('').join('  '); answer = item.$2; extra = 'رتب الحروف لتكوين كلمة صحيحة.';
+    } else {
+      final item = _descriptions[rnd.nextInt(_descriptions.length)]; prompt = item.$1; answer = item.$2; extra = 'اكتب اسم الشيء الذي تصفه الجملة.';
+    }
+    input.clear(); completed = false; message = ''; revealed = true;
+  }
+  Future<void> _finish() async {
+    if (completed || busy) return;
+    setState(() => busy = true);
+    final now = DateTime.now();
+    final id = 'mini_${widget.kind}_${now.year}_${now.month}_${now.day}';
+    final first = await awardOnce(id, 5, widget.onEarn);
+    if (!mounted) return;
+    setState(() { completed = true; busy = false; message = first ? 'أحسنت! حصلت على 5 نقاط.' : 'أكملت تحدي اليوم من هذا النوع مسبقاً.'; });
+    await AppFeedback.play(SoundCue.win);
+  }
+  Future<void> _check() async {
+    if (widget.kind == 'imagination') {
+      if (input.text.trim().length < 4) { setState(() => message = 'اكتب فكرة قصيرة أولاً.'); return; }
+      await _finish(); return;
+    }
+    if (cleanAnswer(input.text) == cleanAnswer(answer)) { await _finish(); }
+    else { await AppFeedback.play(SoundCue.wrong); if (mounted) setState(() => message = 'ليست الإجابة الصحيحة، حاول مرة أخرى.'); }
+  }
+  @override
+  void dispose() { input.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF111D30),
+    appBar: AppBar(backgroundColor: widget.accent.withOpacity(.18), foregroundColor: widget.accent, title: Text(widget.title)),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Container(padding: const EdgeInsets.all(21), decoration: BoxDecoration(gradient: LinearGradient(colors: [widget.accent.withOpacity(.28), const Color(0xFF17263B)]), borderRadius: BorderRadius.circular(24), border: Border.all(color: widget.accent.withOpacity(.55))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [Icon(Icons.auto_awesome_rounded, color: widget.accent), const SizedBox(width: 8), Text('مهمة التحدي', style: TextStyle(color: widget.accent, fontWeight: FontWeight.w900))]),
+          const SizedBox(height: 17),
+          Text(prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.6)),
+          const SizedBox(height: 12),
+          Text(extra, style: const TextStyle(color: Colors.white70, height: 1.5)),
+          if (widget.kind == 'laugh' && revealed && !completed) ...[
+            const SizedBox(height: 14),
+            FilledButton(onPressed: () => setState(() => revealed = false), child: const Text('اكشف النهاية الطريفة')),
+            if (!revealed) Text(answer, style: TextStyle(color: widget.accent, fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+          if (widget.kind == 'focus') ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(onPressed: () => setState(() => revealed = !revealed), icon: Icon(revealed ? Icons.visibility_off : Icons.visibility), label: Text(revealed ? 'إخفاء الأرقام' : 'إظهار الأرقام')),
+            if (!revealed) const Text('تم إخفاء الرمز. اكتب ما حفظته أدناه.', style: TextStyle(color: Colors.white70)),
+          ],
+        ]),
+      ),
+      const SizedBox(height: 18),
+      if (widget.kind == 'compliment') ...[
+        FilledButton.icon(onPressed: completed ? null : () async { await Clipboard.setData(ClipboardData(text: answer)); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم نسخ المجاملة.'))); await _finish(); }, icon: const Icon(Icons.copy_rounded), label: const Text('نسخ العبارة وإكمال التحدي')),
+      ] else if (widget.kind == 'laugh') ...[
+        FilledButton(onPressed: completed ? null : _finish, child: const Text('أكملت تحدي الضحك')),
+      ] else ...[
+        TextField(controller: input, enabled: !completed, textAlign: TextAlign.center, decoration: InputDecoration(hintText: widget.kind == 'imagination' ? 'اكتب فكرتك هنا...' : 'اكتب إجابتك هنا', filled: true, fillColor: const Color(0xFF1B2945), border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)))),
+        const SizedBox(height: 12),
+        FilledButton.icon(onPressed: completed || busy ? null : _check, icon: const Icon(Icons.check_circle_rounded), label: const Text('تحقق وأكمل')),
+      ],
+      if (message.isNotEmpty) Padding(padding: const EdgeInsets.all(14), child: Text(message, textAlign: TextAlign.center, style: TextStyle(color: widget.accent, fontWeight: FontWeight.bold))),
+      if (completed) OutlinedButton.icon(onPressed: _newTask, icon: const Icon(Icons.refresh_rounded), label: const Text('تحدٍ آخر')),
+    ]),
+  );
 }
 
 class _SquareGameCard extends StatelessWidget {
