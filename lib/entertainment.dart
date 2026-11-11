@@ -225,47 +225,113 @@ class QuizLevelsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cards = <_SquareGameCard>[
-      _SquareGameCard(title: 'المستوى السهل', subtitle: 'ابدأ بالإحماء', icon: Icons.sentiment_satisfied_alt_rounded, color: const Color(0xFF48B887), tag: 'سهل', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار سهل', questions: easy, levelKey: 'سهل', onEarn: onEarn)))),
-      _SquareGameCard(title: 'المستوى المتوسط', subtitle: 'اختبر معلوماتك', icon: Icons.psychology_rounded, color: const Color(0xFFE0B84F), tag: 'متوسط', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار متوسط', questions: medium, levelKey: 'متوسط', onEarn: onEarn)))),
-      _SquareGameCard(title: 'المستوى الصعب', subtitle: 'تحدَّ قدراتك', icon: Icons.local_fire_department_rounded, color: const Color(0xFFE47A58), tag: 'صعب', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار صعب', questions: hard, levelKey: 'صعب', onEarn: onEarn)))),
-      _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'مسائل تتولد بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
-      _SquareGameCard(title: 'بنك الأسئلة', subtitle: '1200 مسألة حسابية', icon: Icons.library_books_rounded, color: const Color(0xFF83B7FF), tag: 'بنك', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn)))),
-      _SquareGameCard(title: 'اختبار اليوم', subtitle: '10 أسئلة جديدة', icon: Icons.today_rounded, color: const Color(0xFFD7B8FF), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل المعلومات', subtitle: '1000 مرحلة • 10 أسئلة لكل مرحلة', icon: Icons.school_rounded, color: const Color(0xFF48B887), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'اختبار المعلومات', stageKey: 'info_stages', questions: [...easy, ...medium, ...hard], accent: const Color(0xFF48B887), onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل الحساب والذكاء', subtitle: '1000 مرحلة • 10 أسئلة لكل مرحلة', icon: Icons.calculate_rounded, color: const Color(0xFF83B7FF), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'الحساب والذكاء', stageKey: 'math_stages', questions: generatedQuestionBank(), accent: const Color(0xFF83B7FF), onEarn: onEarn)))),
+      _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة حسابية بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'اختبار اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFD7B8FF), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
     ];
-
     return Scaffold(
-      backgroundColor: const Color(0xFF251B3D),
-      appBar: AppBar(backgroundColor: const Color(0xFF49316E), foregroundColor: const Color(0xFFD7B8FF), title: const Text('مستويات الاختبار')),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-        children: [
-          Container(
-            padding: const EdgeInsets.all(19),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(23),
-              gradient: const LinearGradient(colors: [Color(0xFF65449A), Color(0xFF2A2145)], begin: Alignment.topRight, end: Alignment.bottomLeft),
-              border: Border.all(color: const Color(0xFFD7B8FF).withOpacity(.4)),
-            ),
-            child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('مركز الاختبارات', style: TextStyle(color: Color(0xFFE9D9FF), fontSize: 23, fontWeight: FontWeight.w900)),
-              SizedBox(height: 7),
-              Text('اختر مستوى يناسبك أو ادخل التحدي المفتوح. كل إجابة صحيحة تمنحك 10 نقاط لأول مرة.', style: TextStyle(color: Colors.white70, height: 1.55, fontSize: 12)),
-            ]),
+      backgroundColor: const Color(0xFF171D38),
+      appBar: AppBar(backgroundColor: const Color(0xFF344B83), foregroundColor: const Color(0xFFB5C7FF), title: const Text('مركز المراحل')),
+      body: ListView(padding: const EdgeInsets.all(16), children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            gradient: const LinearGradient(colors: [Color(0xFF355C9A), Color(0xFF241D49)], begin: Alignment.topRight, end: Alignment.bottomLeft),
+            border: Border.all(color: const Color(0xFFB5C7FF).withOpacity(.5)),
+            boxShadow: [BoxShadow(color: const Color(0xFF668CFF).withOpacity(.18), blurRadius: 22, offset: const Offset(0, 8))],
           ),
-          const SizedBox(height: 20),
-          const Text('اختر نمط التحدي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-          const SizedBox(height: 12),
-          GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: .94,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            children: cards,
-          ),
-        ],
-      ),
+          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('رحلة الألف مرحلة', style: TextStyle(color: Color(0xFFE3EAFF), fontSize: 23, fontWeight: FontWeight.w900)),
+            SizedBox(height: 8),
+            Text('أكمل 10 أسئلة في المرحلة لتُغلق نهائياً ويُفتح لك المستوى التالي. تقدمك محفوظ على جهازك.', style: TextStyle(color: Colors.white70, height: 1.55, fontSize: 12)),
+          ]),
+        ),
+        const SizedBox(height: 18),
+        GridView.count(crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: .94, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), children: cards),
+      ]),
+    );
+  }
+}
+
+class StageLevelsPage extends StatefulWidget {
+  final String title, stageKey;
+  final List<Q> questions;
+  final Color accent;
+  final Future<void> Function(int) onEarn;
+  const StageLevelsPage({super.key, required this.title, required this.stageKey, required this.questions, required this.accent, required this.onEarn});
+  @override
+  State<StageLevelsPage> createState() => _StageLevelsPageState();
+}
+class _StageLevelsPageState extends State<StageLevelsPage> {
+  int completed = 0;
+  bool ready = false;
+  static const int totalStages = 1000;
+  @override
+  void initState() { super.initState(); _load(); }
+  Future<void> _load() async {
+    final p = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() { completed = (p.getInt('completed_${widget.stageKey}') ?? 0).clamp(0, totalStages); ready = true; });
+  }
+  Future<void> _openStage(int stage) async {
+    if (stage != completed + 1 || stage > totalStages) return;
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(
+      title: '${widget.title} • المرحلة $stage',
+      questions: widget.questions,
+      levelKey: widget.stageKey,
+      stageNumber: stage,
+      onEarn: widget.onEarn,
+    )));
+    await _load();
+  }
+  @override
+  Widget build(BuildContext context) {
+    final progress = completed / totalStages;
+    return Scaffold(
+      backgroundColor: const Color(0xFF111D30),
+      appBar: AppBar(backgroundColor: widget.accent.withOpacity(.22), foregroundColor: widget.accent, title: Text(widget.title)),
+      body: !ready ? const Center(child: CircularProgressIndicator()) : Column(children: [
+        Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 10), child: Container(
+          padding: const EdgeInsets.all(17),
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [widget.accent.withOpacity(.28), const Color(0xFF17263B)]), borderRadius: BorderRadius.circular(21), border: Border.all(color: widget.accent.withOpacity(.5))),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [Expanded(child: Text('إنجازك: $completed / $totalStages', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900))), Icon(Icons.military_tech_rounded, color: widget.accent, size: 27)]),
+            const SizedBox(height: 10),
+            ClipRRect(borderRadius: BorderRadius.circular(12), child: LinearProgressIndicator(value: progress, minHeight: 9, color: widget.accent, backgroundColor: Colors.white12)),
+            const SizedBox(height: 8),
+            Text(completed == totalStages ? 'أكملت جميع المراحل!' : 'المرحلة المتاحة الآن: ${completed + 1} • 10 أسئلة', style: TextStyle(color: widget.accent, fontSize: 11, fontWeight: FontWeight.bold)),
+          ]),
+        )),
+        Expanded(child: GridView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 22),
+          itemCount: totalStages,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 9, mainAxisSpacing: 9, childAspectRatio: 1),
+          itemBuilder: (context, i) {
+            final stage = i + 1;
+            final isDone = stage <= completed;
+            final isOpen = stage == completed + 1;
+            final color = isDone ? const Color(0xFF435064) : isOpen ? widget.accent : const Color(0xFF202B3D);
+            return Material(
+              color: color.withOpacity(isOpen ? .24 : .75),
+              borderRadius: BorderRadius.circular(13),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(13),
+                onTap: isOpen ? () => _openStage(stage) : null,
+                child: Container(
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(13), border: Border.all(color: isOpen ? widget.accent : Colors.white.withOpacity(.07), width: isOpen ? 1.5 : 1)),
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Icon(isDone ? Icons.lock_rounded : isOpen ? Icons.play_circle_fill_rounded : Icons.lock_outline_rounded, color: isOpen ? widget.accent : Colors.white38, size: 19),
+                    const SizedBox(height: 4),
+                    Text('$stage', style: TextStyle(color: isOpen ? Colors.white : isDone ? Colors.white60 : Colors.white30, fontWeight: FontWeight.w900, fontSize: 12)),
+                  ]),
+                ),
+              ),
+            );
+          },
+        )),
+      ]),
     );
   }
 }
@@ -454,9 +520,9 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
 class QuizPlayPage extends StatefulWidget {
   final String title, levelKey;
   final List<Q> questions;
-  final int? questionLimit;
+  final int? questionLimit, stageNumber;
   final Future<void> Function(int) onEarn;
-  const QuizPlayPage({super.key, required this.title, required this.questions, required this.levelKey, required this.onEarn, this.questionLimit});
+  const QuizPlayPage({super.key, required this.title, required this.questions, required this.levelKey, required this.onEarn, this.questionLimit, this.stageNumber});
   @override
   State<QuizPlayPage> createState() => _QuizPlayPageState();
 }
@@ -464,73 +530,117 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
   late List<int> order;
   int index = 0, score = 0;
   int? selected;
-  bool finished = false;
+  bool finished = false, ready = false, blocked = false;
   String feedback = '';
-  bool ready = false;
   @override
-  void initState() {
-    super.initState();
-    order = List.generate(widget.questions.length, (i) => i)..shuffle();
-    _loadProgress();
-  }
+  void initState() { super.initState(); order = []; _loadProgress(); }
   Future<void> _loadProgress() async {
-    final unseen = await loadUnseenOrder('seen_quiz_${widget.levelKey}', widget.questions.length);
-    final selected = widget.questionLimit == null
-        ? unseen
-        : unseen.take(widget.questionLimit!).toList();
+    final prefs = await SharedPreferences.getInstance();
+    if (widget.stageNumber != null) {
+      final completed = prefs.getInt('completed_${widget.levelKey}') ?? 0;
+      if (widget.stageNumber! <= completed || widget.stageNumber! != completed + 1) {
+        if (mounted) setState(() { blocked = true; ready = true; });
+        return;
+      }
+      final indices = List<int>.generate(widget.questions.length, (i) => i);
+      indices.shuffle(math.Random(widget.stageNumber! * 7919));
+      order = indices.take(math.min(10, indices.length)).toList();
+      if (order.length < 10 && indices.isNotEmpty) {
+        final random = math.Random(widget.stageNumber! * 104729);
+        while (order.length < 10) { order.add(indices[random.nextInt(indices.length)]); }
+      }
+    } else {
+      final unseen = await loadUnseenOrder('seen_quiz_${widget.levelKey}', widget.questions.length);
+      order = widget.questionLimit == null ? unseen : unseen.take(widget.questionLimit!).toList();
+    }
     if (!mounted) return;
-    setState(() { order = selected; ready = true; });
+    setState(() => ready = true);
   }
   Q get current => widget.questions[order[index]];
   Future<void> choose(int n) async {
-    if (selected != null) return;
+    if (selected != null || finished || blocked) return;
     setState(() => selected = n);
-    await markItemSeen('seen_quiz_${widget.levelKey}', order[index]);
+    if (widget.stageNumber == null) await markItemSeen('seen_quiz_${widget.levelKey}', order[index]);
     if (n == current.answer) {
       await AppFeedback.play(SoundCue.correct);
       score += 10;
-      final first = await awardOnce('quiz_' + widget.levelKey + '_' + order[index].toString(), 10, widget.onEarn);
-      if (mounted) setState(() => feedback = first ? 'صحيح! ربحت 10 نقاط.' : 'إجابة صحيحة! سبق احتساب نقاط هذا السؤال.');
+      final eventId = widget.stageNumber == null
+          ? 'quiz_${widget.levelKey}_${order[index]}'
+          : 'stage_${widget.levelKey}_${widget.stageNumber}_${index + 1}';
+      final first = await awardOnce(eventId, 10, widget.onEarn);
+      if (mounted) setState(() => feedback = first ? 'إجابة صحيحة! +10 نقاط.' : 'إجابة صحيحة!');
     } else {
       await AppFeedback.play(SoundCue.wrong);
-      setState(() => feedback = 'الإجابة الصحيحة: ' + current.choices[current.answer]);
+      if (mounted) setState(() => feedback = 'الإجابة الصحيحة: ${current.choices[current.answer]}');
     }
   }
-  void next() {
-    if (index == order.length - 1) { AppFeedback.play(SoundCue.win); setState(() => finished = true); }
-    else { setState(() { index++; selected = null; feedback = ''; }); }
+  Future<void> next() async {
+    if (index == order.length - 1) {
+      if (widget.stageNumber != null) {
+        final prefs = await SharedPreferences.getInstance();
+        final completed = prefs.getInt('completed_${widget.levelKey}') ?? 0;
+        if (widget.stageNumber == completed + 1) {
+          await prefs.setInt('completed_${widget.levelKey}', widget.stageNumber!);
+        }
+      }
+      await AppFeedback.play(SoundCue.win);
+      if (mounted) setState(() => finished = true);
+    } else {
+      setState(() { index++; selected = null; feedback = ''; });
+    }
   }
   @override
-  Widget build(BuildContext context) => !ready
-    ? const Scaffold(backgroundColor: Color(0xFF1B2442), body: Center(child: CircularProgressIndicator()))
-    : Scaffold(backgroundColor: const Color(0xFF1B2442), 
-    appBar: AppBar(backgroundColor: const Color(0xFF344B83), foregroundColor: const Color(0xFFB5C7FF), title: Text(widget.title)),
-    body: Padding(padding: const EdgeInsets.all(18), child: finished
-      ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.emoji_events, color: gold, size: 72),
-          const SizedBox(height: 10),
-          const Text('انتهى الاختبار!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          Text('نتيجتك: ' + score.toString() + ' من ' + (order.length * 10).toString()),
-          const SizedBox(height: 16),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('العودة للمستويات')),
-        ]))
-      : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(minHeight: 8, value: (index + 1) / order.length, color: gold, backgroundColor: panel)),
-          const SizedBox(height: 16),
-          Text('السؤال ' + (index + 1).toString() + ' / ' + order.length.toString(), style: const TextStyle(color: gold)),
-          const SizedBox(height: 12),
-          Text(current.text, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.5)),
-          const SizedBox(height: 18),
-          ...List.generate(4, (i) => Padding(padding: const EdgeInsets.only(bottom: 9), child: OutlinedButton(
-            style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(16), side: BorderSide(color: selected != null && i == current.answer ? gold : Colors.white24), backgroundColor: selected != null && i == current.answer ? green : Colors.transparent),
-            onPressed: selected == null ? () => choose(i) : null,
-            child: Align(alignment: Alignment.centerRight, child: Text(current.choices[i])),
-          ))),
-          if (feedback.isNotEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(feedback, style: const TextStyle(color: gold))),
-          const Spacer(),
-          FilledButton(onPressed: selected == null ? null : next, child: Text(index == order.length - 1 ? 'إنهاء الاختبار' : 'السؤال التالي')),
-        ])),
-  );
+  Widget build(BuildContext context) {
+    if (!ready) return const Scaffold(backgroundColor: Color(0xFF1B2442), body: Center(child: CircularProgressIndicator()));
+    if (blocked) return Scaffold(backgroundColor: const Color(0xFF1B2442), appBar: AppBar(title: Text(widget.title)), body: Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
+      const Icon(Icons.lock_rounded, color: gold, size: 64),
+      const SizedBox(height: 12),
+      const Text('هذه المرحلة مقفلة', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 8),
+      const Text('أكمل المرحلة المفتوحة أولاً. المراحل المكتملة لا يمكن فتحها مرة أخرى.', textAlign: TextAlign.center),
+      const SizedBox(height: 16),
+      FilledButton(onPressed: () => Navigator.pop(context), child: const Text('العودة للمراحل')),
+    ]))));
+    return Scaffold(
+      backgroundColor: const Color(0xFF111D30),
+      appBar: AppBar(backgroundColor: const Color(0xFF243F70), foregroundColor: const Color(0xFFDCE7FF), title: Text(widget.title)),
+      body: Padding(padding: const EdgeInsets.all(18), child: finished
+        ? Center(child: Container(
+            width: double.infinity, padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF315B79), Color(0xFF20294B)]), borderRadius: BorderRadius.circular(25), border: Border.all(color: gold.withOpacity(.55))),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.workspace_premium_rounded, color: gold, size: 72),
+              const SizedBox(height: 12),
+              const Text('أُغلقت المرحلة بنجاح!', style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900)),
+              Text('المرحلة ${widget.stageNumber ?? ''} • نتيجتك: $score من ${order.length * 10}', textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              const Text('تم حفظ إنجازك. المرحلة التالية أصبحت متاحة.', style: TextStyle(color: Colors.white70)),
+              const SizedBox(height: 16),
+              FilledButton.icon(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.lock_rounded), label: const Text('العودة إلى خريطة المراحل')),
+            ]),
+          ))
+        : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Row(children: [
+              Expanded(child: Text(widget.stageNumber == null ? 'السؤال ${index + 1} / ${order.length}' : 'المرحلة ${widget.stageNumber} • السؤال ${index + 1} من 10', style: const TextStyle(color: gold, fontWeight: FontWeight.bold))),
+              Text('+$score نقطة', style: const TextStyle(color: gold, fontWeight: FontWeight.bold)),
+            ]),
+            const SizedBox(height: 10),
+            ClipRRect(borderRadius: BorderRadius.circular(10), child: LinearProgressIndicator(minHeight: 9, value: (index + 1) / order.length, color: gold, backgroundColor: panel)),
+            const SizedBox(height: 22),
+            Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF263D63), Color(0xFF1B2945)]), borderRadius: BorderRadius.circular(22), border: Border.all(color: Colors.white12)), child: Text(current.text, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.55))),
+            const SizedBox(height: 18),
+            ...List.generate(current.choices.length, (i) => Padding(padding: const EdgeInsets.only(bottom: 9), child: OutlinedButton(
+              style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(16), side: BorderSide(color: selected != null && i == current.answer ? gold : Colors.white24), backgroundColor: selected != null && i == current.answer ? green : const Color(0xFF1B2945)),
+              onPressed: selected == null ? () => choose(i) : null,
+              child: Align(alignment: Alignment.centerRight, child: Text(current.choices[i], style: const TextStyle(fontSize: 15))),
+            ))),
+            if (feedback.isNotEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(feedback, style: const TextStyle(color: gold, fontWeight: FontWeight.bold))),
+            const Spacer(),
+            FilledButton.icon(onPressed: selected == null ? null : next, icon: Icon(index == order.length - 1 ? Icons.lock_rounded : Icons.arrow_back_rounded), label: Text(index == order.length - 1 ? 'إنهاء وإغلاق المرحلة' : 'السؤال التالي')),
+          ]),
+      ),
+    );
+  }
 }
 
 class Riddle {
