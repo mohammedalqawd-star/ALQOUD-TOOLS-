@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'entertainment.dart';
 import 'quotes_page.dart';
 import 'extra_tools.dart';
+import 'language_learning.dart';
 
 const gold = Color(0xFFC9A227);
 const green = Color(0xFF073B2B);
@@ -185,6 +186,7 @@ class _HomePageState extends State<HomePage> {
       ChallengesPage(onEarn: addPoints),
       const QuoteLibraryPage(),
       const ToolsPage(),
+      const LanguageLearningPage(),
     ];
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -196,7 +198,7 @@ class _HomePageState extends State<HomePage> {
         child: Scaffold(
           body: SafeArea(child: IndexedStack(index: tab, children: pages)),
           bottomNavigationBar: NavigationBar(
-            backgroundColor: [green, const Color(0xFF15566A), const Color(0xFF813C4A), const Color(0xFF49316E), const Color(0xFF183B63)][tab],
+            backgroundColor: [green, const Color(0xFF15566A), const Color(0xFF813C4A), const Color(0xFF49316E), const Color(0xFF183B63), const Color(0xFF29244D)][tab],
             indicatorColor: Colors.white.withOpacity(.18),
             selectedIndex: tab,
             onDestinationSelected: _selectTab,
@@ -206,6 +208,7 @@ class _HomePageState extends State<HomePage> {
               NavigationDestination(icon: Icon(Icons.today_outlined), label: 'اليومي'),
               NavigationDestination(icon: Icon(Icons.format_quote), label: 'عبارات'),
               NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
+              NavigationDestination(icon: Icon(Icons.language_rounded), label: 'اللغات'),
             ],
           ),
         ),
@@ -346,6 +349,7 @@ class _Dashboard extends StatelessWidget {
               _FeatureCard(title: 'تحدي اليوم', subtitle: 'مهمة جديدة كل يوم', icon: Icons.bolt_rounded, colors: const [Color(0xFF76551D), Color(0xFF3F3219)], onTap: () => go(2)),
               _FeatureCard(title: 'عبارات ملهمة', subtitle: 'كلمات تحفظها وتشاركها', icon: Icons.format_quote_rounded, colors: const [Color(0xFF354D83), Color(0xFF202E50)], onTap: () => go(3)),
               _FeatureCard(title: 'الأدوات الذكية', subtitle: 'حاسبات وأدوات مفيدة', icon: Icons.auto_awesome_rounded, colors: const [Color(0xFF69406F), Color(0xFF3E294B)], onTap: () => go(4)),
+              _FeatureCard(title: 'تعلم اللغات', subtitle: 'كلمات وحروف ونطق وقصص', icon: Icons.language_rounded, colors: const [Color(0xFF654A9D), Color(0xFF28254F)], onTap: () => go(5)),
             ],
           ),
           const SizedBox(height: 18),
