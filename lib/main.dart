@@ -515,6 +515,22 @@ class _ToolsPageState extends State<ToolsPage> {
         ),
         Card(
           color: const Color(0xFF1A3455),
+          child: ListTile(
+            leading: const Icon(Icons.music_note_rounded, color: gold),
+            title: const Text('تجربة الصوت'),
+            subtitle: const Text('اضغط للتأكد من عمل المؤثرات الصوتية'),
+            trailing: const Icon(Icons.play_circle_fill_rounded, color: gold),
+            onTap: () async {
+              await AppFeedback.testSound();
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('تم تشغيل اختبار الصوت. تأكد من مستوى صوت الوسائط.')),
+              );
+            },
+          ),
+        ),
+        Card(
+          color: const Color(0xFF1A3455),
           child: SwitchListTile(
             secondary: const Icon(Icons.notifications_active, color: Color(0xFFD8E8FF)),
             title: const Text('التذكير اليومي'),
