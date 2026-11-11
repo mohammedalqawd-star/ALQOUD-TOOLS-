@@ -28,7 +28,96 @@ class AlQoudApp extends StatelessWidget {
         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: gold)),
       ),
     ),
-    home: const HomePage(),
+    home: const SplashScreen(),
+  );
+}
+
+
+class AlQoudLogo extends StatelessWidget {
+  final double size;
+  const AlQoudLogo({super.key, this.size = 64});
+  @override
+  Widget build(BuildContext context) => Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      gradient: const LinearGradient(
+        colors: [Color(0xFFE8D9A0), Color(0xFFC9A227), Color(0xFF805D16)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      boxShadow: [BoxShadow(color: gold.withOpacity(.22), blurRadius: 18, spreadRadius: 2)],
+    ),
+    padding: const EdgeInsets.all(3),
+    child: Container(
+      decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF073B2B)),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(Icons.shield_moon_outlined, color: gold, size: size * .68),
+          Text('Q', style: TextStyle(color: const Color(0xFFE8D9A0), fontSize: size * .29, fontWeight: FontWeight.w900)),
+        ],
+      ),
+    ),
+  );
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 2100), () {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (_, __, ___) => const HomePage(),
+          transitionDuration: const Duration(milliseconds: 450),
+          transitionsBuilder: (_, animation, __, child) => FadeTransition(opacity: animation, child: child),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Directionality(
+    textDirection: TextDirection.rtl,
+    child: Scaffold(
+      body: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF14543D), Color(0xFF071B16), Color(0xFF04110D)],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const AlQoudLogo(size: 116),
+            const SizedBox(height: 24),
+            const Text('ALQOUD TOOLS', style: TextStyle(color: Color(0xFFE8D9A0), fontSize: 27, fontWeight: FontWeight.w900, letterSpacing: 2.2)),
+            const SizedBox(height: 9),
+            const Text('الأدوات • المعرفة • التحدي', style: TextStyle(color: Colors.white70, fontSize: 15)),
+            const SizedBox(height: 34),
+            SizedBox(width: 90, child: LinearProgressIndicator(
+              minHeight: 3,
+              color: gold,
+              backgroundColor: Colors.white12,
+              borderRadius: BorderRadius.circular(8),
+            )),
+            const SizedBox(height: 16),
+            const Text('إصنع إنجازك كل يوم', style: TextStyle(color: Colors.white54, fontSize: 12)),
+          ],
+        ),
+      ),
+    ),
   );
 }
 
@@ -96,7 +185,7 @@ class _Dashboard extends StatelessWidget {
         border: Border.all(color: gold),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text('ALQOUD', style: TextStyle(color: gold, letterSpacing: 3, fontWeight: FontWeight.bold)),
+        const Row(children: [AlQoudLogo(size: 46), SizedBox(width: 12), Text('ALQOUD TOOLS', style: TextStyle(color: gold, letterSpacing: 2, fontWeight: FontWeight.bold))]),
         const SizedBox(height: 10),
         const Text('تعلّم، تحدَّ نفسك، واستمتع!', style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
