@@ -75,8 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    AppFeedback.play(SoundCue.open);
-    Future.delayed(const Duration(milliseconds: 2100), () {
+    _startWelcome();
+    Future.delayed(const Duration(milliseconds: 4500), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
@@ -86,6 +86,11 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       );
     });
+  }
+
+  Future<void> _startWelcome() async {
+    await AppFeedback.speakWelcome();
+    await AppFeedback.play(SoundCue.open);
   }
 
   @override
