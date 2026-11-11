@@ -32,6 +32,8 @@ class GamesHubPage extends StatelessWidget {
       ['اختبارات المعلومات', 'ثلاثة مستويات: سهل ومتوسط وصعب', Icons.quiz, const Color(0xFF48B887), () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizLevelsPage(onEarn: onEarn)))],
       ['ألغاز وذكاء', 'ألغاز كثيرة مع تلميحات وكشف الحل', Icons.psychology_alt, const Color(0xFF9B83E8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => RiddlesPage(onEarn: onEarn)))],
       ['خمن الكلمة', 'اكتشف الكلمة من التلميحات', Icons.lightbulb, const Color(0xFFD49A39), () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuessWordPage(onEarn: onEarn)))],
+      ['لعبة الذاكرة', 'طابق البطاقات واختبر ذاكرتك', Icons.grid_view_rounded, const Color(0xFF56C7D8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => MemoryPairsPage(onEarn: onEarn)))],
+      ['صح أم خطأ', 'أسئلة سريعة ومعلومات متنوعة', Icons.fact_check_rounded, const Color(0xFFFF8A80), () => Navigator.push(context, MaterialPageRoute(builder: (_) => TrueFalsePage(onEarn: onEarn)))],
     ];
     return Scaffold(backgroundColor: const Color(0xFF102B36), 
       appBar: AppBar(backgroundColor: const Color(0xFF15566A), foregroundColor: const Color(0xFF8CE6E0), title: const Text('الألعاب والتحديات')),
@@ -624,5 +626,186 @@ class QuotesPage extends StatelessWidget {
         }),
       ))),
     ]),
+  );
+}
+
+class MemoryPairsPage extends StatefulWidget {
+  final Future<void> Function(int) onEarn;
+  const MemoryPairsPage({super.key, required this.onEarn});
+  @override
+  State<MemoryPairsPage> createState() => _MemoryPairsPageState();
+}
+
+class _MemoryPairsPageState extends State<MemoryPairsPage> {
+  static const symbols = ['🚀', '🎈', '🌟', '🍀', '🎨', '⚽'];
+  late List<String> cards;
+  final Set<int> matched = {};
+  int? first;
+  int moves = 0;
+  bool locked = false;
+  bool finished = false;
+
+  @override
+  void initState() { super.initState(); _restart(); }
+
+  void _restart() {
+    cards = [...symbols, ...symbols]..shuffle(math.Random());
+    matched.clear();
+    first = null;
+    moves = 0;
+    locked = false;
+    finished = false;
+  }
+
+  Future<void> _flip(int i) async {
+    if (locked || finished || matched.contains(i) || first == i) return;
+    if (first == null) {
+      setState(() => first = i);
+      return;
+    }
+    final previous = first!;
+    setState(() { first = i; moves++; });
+    if (cards[previous] == cards[i]) {
+      setState(() { matched.add(previous); matched.add(i); first = null; });
+      await AppFeedback.play(SoundCue.correct);
+      if (matched.length == cards.length) {
+        final earned = await awardOnce('memory_pairs_complete', 20, widget.onEarn);
+        if (!mounted) return;
+        setState(() => finished = true);
+        await AppFeedback.play(SoundCue.win);
+        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(earned ? 'أحسنت! ربحت 20 نقطة.' : 'أكملت اللعبة مرة أخرى!'),
+        ));
+      }
+    } else {
+      setState(() => locked = true);
+      await AppFeedback.play(SoundCue.wrong);
+      await Future<void>.delayed(const Duration(milliseconds: 650));
+      if (!mounted) return;
+      setState(() { first = null; locked = false; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF102B36),
+    appBar: AppBar(
+      backgroundColor: const Color(0xFF15566A),
+      foregroundColor: const Color(0xFF8CE6E0),
+      title: const Text('لعبة الذاكرة'),
+      actions: [IconButton(onPressed: () => setState(_restart), icon: const Icon(Icons.refresh_rounded))],
+    ),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Text('المحاولات: $moves', textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, color: Color(0xFF8CE6E0))),
+      const SizedBox(height: 14),
+      GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: cards.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
+        itemBuilder: (context, i) {
+          final shown = matched.contains(i) || first == i;
+          return InkWell(
+            onTap: () => _flip(i),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: shown
+                  ? [const Color(0xFF287E83), const Color(0xFF17545F)]
+                  : [const Color(0xFF24485A), const Color(0xFF183142)]),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: matched.contains(i) ? const Color(0xFF8CE6E0) : Colors.white24),
+              ),
+              child: Center(child: Text(shown ? cards[i] : '؟', style: const TextStyle(fontSize: 34))),
+            ),
+          );
+        },
+      ),
+      const SizedBox(height: 16),
+      if (finished) FilledButton(onPressed: () => setState(_restart), child: const Text('العب مرة أخرى'))
+      else const Text('اقلب بطاقتين في كل مرة، وحاول العثور على جميع الأزواج.', textAlign: TextAlign.center),
+    ]),
+  );
+}
+
+class TrueFalsePage extends StatefulWidget {
+  final Future<void> Function(int) onEarn;
+  const TrueFalsePage({super.key, required this.onEarn});
+  @override
+  State<TrueFalsePage> createState() => _TrueFalsePageState();
+}
+
+class _TrueFalsePageState extends State<TrueFalsePage> {
+  static const items = <(String, bool)>[
+    ('الشمس نجم وليست كوكباً.', true),
+    ('عدد أضلاع المربع خمسة.', false),
+    ('القمر يعكس ضوء الشمس.', true),
+    ('الخفاش من الطيور.', false),
+    ('المحيط الهادئ أكبر محيطات الأرض.', true),
+    ('العدد 11 عدد زوجي.', false),
+    ('النحلة تصنع العسل.', true),
+    ('الصوت ينتقل في الفراغ.', false),
+    ('النباتات تقوم بالبناء الضوئي.', true),
+    ('المريخ أكبر من المشتري.', false),
+  ];
+  int index = 0, score = 0;
+  bool? selected;
+  bool finished = false;
+  String feedback = '';
+
+  Future<void> _answer(bool answer) async {
+    if (selected != null) return;
+    final correct = answer == items[index].$2;
+    setState(() {
+      selected = answer;
+      if (correct) score++;
+      feedback = correct ? 'إجابة صحيحة!' : 'الإجابة الصحيحة: ' + (items[index].$2 ? 'صح' : 'خطأ');
+    });
+    await AppFeedback.play(correct ? SoundCue.correct : SoundCue.wrong);
+    if (correct) await awardOnce('true_false_$index', 5, widget.onEarn);
+  }
+
+  void _next() {
+    if (index == items.length - 1) {
+      setState(() => finished = true);
+      AppFeedback.play(SoundCue.win);
+    } else {
+      setState(() { index++; selected = null; feedback = ''; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF30202B),
+    appBar: AppBar(backgroundColor: const Color(0xFF813C4A), foregroundColor: const Color(0xFFFFC3C7), title: const Text('صح أم خطأ')),
+    body: Padding(
+      padding: const EdgeInsets.all(18),
+      child: finished
+        ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFC3C7), size: 72),
+            const Text('انتهى التحدي!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text('نتيجتك: $score من ' + items.length.toString()),
+            FilledButton(onPressed: () => Navigator.pop(context), child: const Text('العودة للألعاب')),
+          ]))
+        : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            LinearProgressIndicator(value: (index + 1) / items.length, color: const Color(0xFFFF9AA5)),
+            const SizedBox(height: 18),
+            Text('السؤال ' + (index + 1).toString() + ' من ' + items.length.toString(), textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            Expanded(child: Container(
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF713B52), Color(0xFF3A2739)]), borderRadius: BorderRadius.circular(24)),
+              child: Center(child: Text(items[index].$1, textAlign: TextAlign.center, style: const TextStyle(fontSize: 25, height: 1.5, fontWeight: FontWeight.bold))),
+            )),
+            const SizedBox(height: 16),
+            Row(children: [
+              Expanded(child: FilledButton(onPressed: selected == null ? () => _answer(true) : null, child: const Text('صح'))),
+              const SizedBox(width: 12),
+              Expanded(child: FilledButton(onPressed: selected == null ? () => _answer(false) : null, child: const Text('خطأ'))),
+            ]),
+            if (feedback.isNotEmpty) Padding(padding: const EdgeInsets.all(12), child: Text(feedback, textAlign: TextAlign.center)),
+            FilledButton(onPressed: selected == null ? null : _next, child: Text(index == items.length - 1 ? 'عرض النتيجة' : 'السؤال التالي')),
+          ]),
+    ),
   );
 }
