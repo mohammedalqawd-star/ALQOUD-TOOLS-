@@ -263,7 +263,18 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
     return value * units[from]! / units[to]!;
   }
 
-  String _formatResult(double value) => value.toStringAsFixed(6).replaceFirst(RegExp(r'0+
+  String _formatResult(double value) {
+    var output = value.toStringAsFixed(6);
+    if (output.contains('.')) {
+      while (output.endsWith('0')) {
+        output = output.substring(0, output.length - 1);
+      }
+      if (output.endsWith('.')) output = output.substring(0, output.length - 1);
+    }
+    return output;
+  }
+
+  void _changeCategory(String value) {
     setState(() {
       category = value;
       from = _units[value]!.keys.first;
@@ -333,7 +344,7 @@ class _UnitConverterPageState extends State<UnitConverterPage> {
             const Text('النتيجة', style: TextStyle(color: Color(0xFFB8DDFF))),
             const SizedBox(height: 8),
             SelectableText(
-              result == null || !result.isFinite ? 'أدخل قيمة صحيحة' : result.toStringAsPrecision(10).replaceFirst(RegExp(r'\\.?0+$'), ''),
+              result == null || !result.isFinite ? 'أدخل قيمة صحيحة' : _formatResult(result),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFFD7E8FF)),
             ),
