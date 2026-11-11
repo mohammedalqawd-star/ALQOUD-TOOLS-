@@ -46,8 +46,6 @@ class AppFeedback {
       await _player.play(BytesSource(_makeWave(notes), mimeType: 'audio/wav'));
       await completed.timeout(Duration(milliseconds: notes.length * 260 + 1200));
     } catch (_) {
-      // Keep the app usable if the device audio service is unavailable.
-    } catch (_) {
       // Audio failures must never interrupt gameplay.
     }
   }
