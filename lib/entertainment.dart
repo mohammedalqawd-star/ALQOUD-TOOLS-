@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'app_feedback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -210,6 +211,7 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
     if (selected != null) return;
     setState(() => selected = value);
     if (value == current.answer) {
+      await AppFeedback.play(SoundCue.correct);
       correct++;
       score += 5;
       final first = await awardOnce('endless_${sessionId}_$number', 5, widget.onEarn);
@@ -218,6 +220,7 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
         feedback = first ? 'إجابة صحيحة! +5 نقاط' : 'إجابة صحيحة!';
       });
     } else {
+      await AppFeedback.play(SoundCue.wrong);
       setState(() => feedback = 'الإجابة الصحيحة: ${current.choices[current.answer]}');
     }
   }
@@ -330,15 +333,17 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
     if (selected != null) return;
     setState(() => selected = n);
     if (n == current.answer) {
+      await AppFeedback.play(SoundCue.correct);
       score += 10;
       final first = await awardOnce('quiz_' + widget.levelKey + '_' + order[index].toString(), 10, widget.onEarn);
       if (mounted) setState(() => feedback = first ? 'صحيح! ربحت 10 نقاط.' : 'إجابة صحيحة! سبق احتساب نقاط هذا السؤال.');
     } else {
+      await AppFeedback.play(SoundCue.wrong);
       setState(() => feedback = 'الإجابة الصحيحة: ' + current.choices[current.answer]);
     }
   }
   void next() {
-    if (index == order.length - 1) { setState(() => finished = true); }
+    if (index == order.length - 1) { AppFeedback.play(SoundCue.win); setState(() => finished = true); }
     else { setState(() { index++; selected = null; feedback = ''; }); }
   }
   @override
@@ -411,10 +416,11 @@ class _RiddlesPageState extends State<RiddlesPage> {
     if (typed.isEmpty) { setState(() => message = 'اكتب تخمينك أولاً.'); return; }
     final solution = cleanAnswer(riddles[index].answer);
     if (typed == solution || (solution.contains(typed) && typed.length >= 3)) {
+      await AppFeedback.play(SoundCue.correct);
       setState(() { revealed = true; message = 'إجابة صحيحة!'; });
       final first = await awardOnce('riddle_' + index.toString(), 10, widget.onEarn);
       if (mounted) setState(() => message = first ? 'أحسنت! ربحت 10 نقاط.' : 'أحسنت! سبق احتساب نقاط هذا اللغز.');
-    } else { setState(() => message = 'ليس هذا الحل. حاول مرة أخرى أو اطلب تلميحاً.'); }
+    } else { await AppFeedback.play(SoundCue.wrong); setState(() => message = 'ليس هذا الحل. حاول مرة أخرى أو اطلب تلميحاً.'); }
   }
   void next() { setState(() { index = (index + 1) % riddles.length; input.clear(); hint = false; revealed = false; message = ''; }); }
   @override
@@ -472,11 +478,12 @@ class _GuessWordPageState extends State<GuessWordPage> {
   void dispose() { input.dispose(); super.dispose(); }
   Future<void> submit() async {
     if (cleanAnswer(input.text) == cleanAnswer(words[index].word)) {
+      await AppFeedback.play(SoundCue.correct);
       setState(() { solved = true; message = 'إجابة ممتازة!'; });
       final points = hintLevel == 0 ? 15 : 10;
       final first = await awardOnce('word_' + index.toString(), points, widget.onEarn);
       if (mounted) setState(() => message = first ? 'صحيح! ربحت ' + points.toString() + ' نقطة.' : 'صحيح! سبق احتساب نقاط هذه الكلمة.');
-    } else { setState(() => message = 'ليست الكلمة المطلوبة. حاول من جديد.'); }
+    } else { await AppFeedback.play(SoundCue.wrong); setState(() => message = 'ليست الكلمة المطلوبة. حاول من جديد.'); }
   }
   String get hintText {
     if (hintLevel == 1) return words[index].hint1;
