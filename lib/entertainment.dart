@@ -323,13 +323,17 @@ List<Q> _stageQuestionsFromPairs(List<(String, String)> pairs, int seed) {
 List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
   if (bank.isEmpty) return const <Q>[];
   final random = math.Random(stage * 7919 + key.length * 101);
-  final indices = List<int>.generate(bank.length, (i) => i)..shuffle(random);
-  final count = math.min(10, bank.length);
-  final start = ((stage - 1) * 10) % bank.length;
   final tier = (stage - 1) ~/ 250;
+  // Each 250-stage band moves forward through the source bank, with a small overlap.
+  final from = (bank.length * (tier * 0.20)).floor();
+  final until = math.min(bank.length, (bank.length * (0.60 + tier * 0.20)).ceil());
+  final band = List<int>.generate(math.max(1, until - from), (i) => from + i);
+  band.shuffle(random);
+  final count = math.min(10, band.length);
+  final start = ((stage - 1) * 10) % band.length;
   final result = <Q>[];
   for (var i = 0; i < count; i++) {
-    final sourceIndex = indices[(start + i) % indices.length];
+    final sourceIndex = band[(start + i) % band.length];
     final original = bank[sourceIndex];
     final choices = List<String>.from(original.choices);
     final correctText = choices[original.answer];
@@ -344,7 +348,7 @@ List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
   }
   var variant = 0;
   while (result.length < 10) {
-    final original = bank[(start + variant) % bank.length];
+    final original = bank[band[(start + variant) % band.length]];
     final choices = List<String>.from(original.choices);
     final correctText = choices[original.answer];
     choices.shuffle(math.Random(stage * 65537 + variant * 131));
