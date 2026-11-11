@@ -340,7 +340,7 @@ class _Dashboard extends StatelessWidget {
             mainAxisSpacing: 11,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.18,
+            childAspectRatio: .96,
             children: [
               _FeatureCard(title: 'الألعاب والاختبارات', subtitle: 'ألغاز وأسئلة وذكاء', icon: Icons.extension_rounded, colors: const [Color(0xFF17664B), Color(0xFF103B2C)], onTap: () => go(1)),
               _FeatureCard(title: 'تحدي اليوم', subtitle: 'مهمة جديدة كل يوم', icon: Icons.bolt_rounded, colors: const [Color(0xFF76551D), Color(0xFF3F3219)], onTap: () => go(2)),
