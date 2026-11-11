@@ -472,23 +472,39 @@ class _RiddlesPageState extends State<RiddlesPage> {
   int index = 0;
   bool hint = false, revealed = false;
   String message = '';
+  bool ready = false;
+  @override
+  void initState() { super.initState(); _loadNextUnseen(); }
+  Future<void> _loadNextUnseen() async {
+    final available = await loadUnseenOrder('seen_riddles', riddles.length);
+    if (!mounted) return;
+    setState(() { index = available.first; ready = true; input.clear(); hint = false; revealed = false; message = ''; });
+  }
   @override
   void dispose() { input.dispose(); super.dispose(); }
   Future<void> check() async {
-    if (revealed) return;
+    if (!ready || revealed) return;
     final typed = cleanAnswer(input.text);
     if (typed.isEmpty) { setState(() => message = 'اكتب تخمينك أولاً.'); return; }
     final solution = cleanAnswer(riddles[index].answer);
     if (typed == solution) {
       await AppFeedback.play(SoundCue.correct);
       setState(() { revealed = true; message = 'إجابة صحيحة!'; });
+      await markItemSeen('seen_riddles', index);
       final first = await awardOnce('riddle_' + index.toString(), 10, widget.onEarn);
       if (mounted) setState(() => message = first ? 'أحسنت! ربحت 10 نقاط.' : 'أحسنت! سبق احتساب نقاط هذا اللغز.');
     } else { await AppFeedback.play(SoundCue.wrong); setState(() => message = 'ليس هذا الحل. حاول مرة أخرى أو اطلب تلميحاً.'); }
   }
-  void next() { setState(() { index = (index + 1) % riddles.length; input.clear(); hint = false; revealed = false; message = ''; }); }
+  Future<void> next() async {
+    await markItemSeen('seen_riddles', index);
+    final available = await loadUnseenOrder('seen_riddles', riddles.length);
+    if (!mounted) return;
+    setState(() { index = available.first; input.clear(); hint = false; revealed = false; message = ''; });
+  }
   @override
-  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF2C1C3D), 
+  Widget build(BuildContext context) => !ready
+    ? const Scaffold(backgroundColor: Color(0xFF2C1C3D), body: Center(child: CircularProgressIndicator()))
+    : Scaffold(backgroundColor: const Color(0xFF2C1C3D), 
     appBar: AppBar(backgroundColor: const Color(0xFF623B79), foregroundColor: const Color(0xFFE0B6FF), title: const Text('ألغاز وذكاء')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
       Text('لغز ' + (index + 1).toString() + ' من ' + riddles.length.toString(), style: const TextStyle(color: gold)),
@@ -538,13 +554,22 @@ class _GuessWordPageState extends State<GuessWordPage> {
   int index = 0, hintLevel = 0;
   bool solved = false;
   String message = '';
+  bool ready = false;
+  @override
+  void initState() { super.initState(); _loadNextUnseen(); }
+  Future<void> _loadNextUnseen() async {
+    final available = await loadUnseenOrder('seen_words', words.length);
+    if (!mounted) return;
+    setState(() { index = available.first; ready = true; hintLevel = 0; solved = false; message = ''; input.clear(); });
+  }
   @override
   void dispose() { input.dispose(); super.dispose(); }
   Future<void> submit() async {
-    if (solved) return;
+    if (!ready || solved) return;
     if (cleanAnswer(input.text) == cleanAnswer(words[index].word)) {
       await AppFeedback.play(SoundCue.correct);
       setState(() { solved = true; message = 'إجابة ممتازة!'; });
+      await markItemSeen('seen_words', index);
       final points = hintLevel == 0 ? 15 : 10;
       final first = await awardOnce('word_' + index.toString(), points, widget.onEarn);
       if (mounted) setState(() => message = first ? 'صحيح! ربحت ' + points.toString() + ' نقطة.' : 'صحيح! سبق احتساب نقاط هذه الكلمة.');
@@ -556,9 +581,16 @@ class _GuessWordPageState extends State<GuessWordPage> {
     if (hintLevel == 3) return words[index].hint3;
     return 'اطلب تلميحاً إذا احتجت إلى مساعدة.';
   }
-  void next() { setState(() { index = (index + 1) % words.length; hintLevel = 0; solved = false; message = ''; input.clear(); }); }
+  Future<void> next() async {
+    await markItemSeen('seen_words', index);
+    final available = await loadUnseenOrder('seen_words', words.length);
+    if (!mounted) return;
+    setState(() { index = available.first; hintLevel = 0; solved = false; message = ''; input.clear(); });
+  }
   @override
-  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF352518), 
+  Widget build(BuildContext context) => !ready
+    ? const Scaffold(backgroundColor: Color(0xFF352518), body: Center(child: CircularProgressIndicator()))
+    : Scaffold(backgroundColor: const Color(0xFF352518), 
     appBar: AppBar(backgroundColor: const Color(0xFF765020), foregroundColor: const Color(0xFFFFD18A), title: const Text('خمن الكلمة')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
       Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), gradient: const LinearGradient(colors: [Color(0xFF604A1E), deep])), child: Column(children: [
@@ -944,11 +976,34 @@ class _MeaningWordPageState extends State<MeaningWordPage> {
   int? selected;
   bool checked = false;
   WordMeaning get current => wordMeanings[order[index]];
-  @override void initState() { super.initState(); order = List.generate(wordMeanings.length, (i) => i)..shuffle(random); _options(); }
+  bool ready = false;
+  @override void initState() { super.initState(); _loadNextUnseen(); }
+  Future<void> _loadNextUnseen() async {
+    final available = await loadUnseenOrder('seen_meanings', wordMeanings.length);
+    if (!mounted) return;
+    setState(() { order = available; index = 0; ready = true; _options(); });
+  }
   void _options() { final set = <String>{current.meaning}; while (set.length < 4) { set.add(wordMeanings[random.nextInt(wordMeanings.length)].meaning); } options = set.toList()..shuffle(random); selected = null; checked = false; }
-  Future<void> _confirm() async { if (selected == null || checked) return; final ok = options[selected!] == current.meaning; setState(() => checked = true); await AppFeedback.play(ok ? SoundCue.correct : SoundCue.wrong); if (ok) { score++; await awardOnce('meaning_word_' + order[index].toString(), 5, widget.onEarn); } }
-  void _next() { setState(() { if (index == order.length - 1) { order = List.generate(wordMeanings.length, (i) => i)..shuffle(random); index = 0; score = 0; } else { index++; } _options(); }); }
-  @override Widget build(BuildContext context) => Scaffold(
+  Future<void> _confirm() async {
+    if (selected == null || checked || !ready) return;
+    final ok = options[selected!] == current.meaning;
+    setState(() => checked = true);
+    await AppFeedback.play(ok ? SoundCue.correct : SoundCue.wrong);
+    await markItemSeen('seen_meanings', order[index]);
+    if (ok) { score++; await awardOnce('meaning_word_' + order[index].toString(), 5, widget.onEarn); }
+  }
+  Future<void> _next() async {
+    if (index == order.length - 1) {
+      await _loadNextUnseen();
+      if (!mounted) return;
+      setState(() => score = 0);
+    } else {
+      setState(() { index++; _options(); });
+    }
+  }
+  @override Widget build(BuildContext context) => !ready
+    ? const Scaffold(backgroundColor: Color(0xFF17283D), body: Center(child: CircularProgressIndicator()))
+    : Scaffold(
     backgroundColor: const Color(0xFF17283D),
     appBar: AppBar(backgroundColor: const Color(0xFF28558A), foregroundColor: const Color(0xFFB9D9FF), title: const Text('ما معنى الكلمة؟')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
