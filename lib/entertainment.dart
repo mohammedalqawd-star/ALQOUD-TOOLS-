@@ -18,6 +18,29 @@ Future<bool> awardOnce(String id, int points, Future<void> Function(int) earn) a
   await earn(points);
   return true;
 }
+
+Future<List<int>> loadUnseenOrder(String key, int length) async {
+  final prefs = await SharedPreferences.getInstance();
+  final seen = (prefs.getStringList(key) ?? <String>[]).toSet();
+  var available = List<int>.generate(length, (i) => i)
+      .where((i) => !seen.contains(i.toString())).toList();
+  if (available.isEmpty) {
+    await prefs.remove(key);
+    available = List<int>.generate(length, (i) => i);
+  }
+  available.shuffle(math.Random());
+  return available;
+}
+
+Future<void> markItemSeen(String key, int index) async {
+  final prefs = await SharedPreferences.getInstance();
+  final seen = prefs.getStringList(key) ?? <String>[];
+  final value = index.toString();
+  if (!seen.contains(value)) {
+    seen.add(value);
+    await prefs.setStringList(key, seen);
+  }
+}
 String cleanAnswer(String s) => s.trim().toLowerCase()
   .replaceAll(RegExp(r'[\u064B-\u065F\u0670]'), '')
   .replaceAll('أ', 'ا').replaceAll('إ', 'ا').replaceAll('آ', 'ا')
@@ -353,12 +376,23 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
   int? selected;
   bool finished = false;
   String feedback = '';
+  bool ready = false;
   @override
-  void initState() { super.initState(); order = List.generate(widget.questions.length, (i) => i)..shuffle(); }
+  void initState() {
+    super.initState();
+    order = List.generate(widget.questions.length, (i) => i)..shuffle();
+    _loadProgress();
+  }
+  Future<void> _loadProgress() async {
+    final unseen = await loadUnseenOrder('seen_quiz_${widget.levelKey}', widget.questions.length);
+    if (!mounted) return;
+    setState(() { order = unseen; ready = true; });
+  }
   Q get current => widget.questions[order[index]];
   Future<void> choose(int n) async {
     if (selected != null) return;
     setState(() => selected = n);
+    await markItemSeen('seen_quiz_${widget.levelKey}', order[index]);
     if (n == current.answer) {
       await AppFeedback.play(SoundCue.correct);
       score += 10;
@@ -374,7 +408,9 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
     else { setState(() { index++; selected = null; feedback = ''; }); }
   }
   @override
-  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF1B2442), 
+  Widget build(BuildContext context) => !ready
+    ? const Scaffold(backgroundColor: Color(0xFF1B2442), body: Center(child: CircularProgressIndicator()))
+    : Scaffold(backgroundColor: const Color(0xFF1B2442), 
     appBar: AppBar(backgroundColor: const Color(0xFF344B83), foregroundColor: const Color(0xFFB5C7FF), title: Text(widget.title)),
     body: Padding(padding: const EdgeInsets.all(18), child: finished
       ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
