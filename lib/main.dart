@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen> {
               borderRadius: BorderRadius.circular(8),
             )),
             const SizedBox(height: 16),
-            const Text('إصنع إنجازك كل يوم', style: TextStyle(color: Colors.white54, fontSize: 12)),
+            const Text('اصنع إنجازك كل يوم', style: TextStyle(color: Colors.white54, fontSize: 12)),
           ],
         ),
       ),
