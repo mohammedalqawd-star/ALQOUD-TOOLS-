@@ -34,6 +34,7 @@ class GamesHubPage extends StatelessWidget {
       ['خمن الكلمة', 'اكتشف الكلمة من التلميحات', Icons.lightbulb, const Color(0xFFD49A39), () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuessWordPage(onEarn: onEarn)))],
       ['لعبة الذاكرة', 'طابق البطاقات واختبر ذاكرتك', Icons.grid_view_rounded, const Color(0xFF56C7D8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => MemoryPairsPage(onEarn: onEarn)))],
       ['صح أم خطأ', 'أسئلة سريعة ومعلومات متنوعة', Icons.fact_check_rounded, const Color(0xFFFF8A80), () => Navigator.push(context, MaterialPageRoute(builder: (_) => TrueFalsePage(onEarn: onEarn)))],
+      ['ما معنى الكلمة؟', 'اختر المعنى الصحيح للكلمة العربية', Icons.menu_book_rounded, const Color(0xFF83B7FF), () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))],
     ];
     return Scaffold(backgroundColor: const Color(0xFF102B36), 
       appBar: AppBar(backgroundColor: const Color(0xFF15566A), foregroundColor: const Color(0xFF8CE6E0), title: const Text('الألعاب والتحديات')),
@@ -141,6 +142,13 @@ class QuizLevelsPage extends StatelessWidget {
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn))),
           ),
         ),
+        const SizedBox(height: 12),
+        Card(color: const Color(0xFF203B59), child: ListTile(
+          leading: const Icon(Icons.library_books_rounded, color: Color(0xFF83B7FF)),
+          title: const Text('بنك الأسئلة • 1,200 سؤال'),
+          subtitle: const Text('أسئلة حسابية متجددة تعمل دون إنترنت'),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn))),
+        )),
         const SizedBox(height: 12),
         ...levels.map((l) => Card(color: panel, child: ListTile(
           contentPadding: const EdgeInsets.all(16),
@@ -369,7 +377,7 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
           const SizedBox(height: 18),
           ...List.generate(4, (i) => Padding(padding: const EdgeInsets.only(bottom: 9), child: OutlinedButton(
             style: OutlinedButton.styleFrom(padding: const EdgeInsets.all(16), side: BorderSide(color: selected != null && i == current.answer ? gold : Colors.white24), backgroundColor: selected != null && i == current.answer ? green : Colors.transparent),
-            onPressed: () => choose(i),
+            onPressed: selected == null ? () => choose(i) : null,
             child: Align(alignment: Alignment.centerRight, child: Text(current.choices[i])),
           ))),
           if (feedback.isNotEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Text(feedback, style: const TextStyle(color: gold))),
@@ -417,7 +425,7 @@ class _RiddlesPageState extends State<RiddlesPage> {
     final typed = cleanAnswer(input.text);
     if (typed.isEmpty) { setState(() => message = 'اكتب تخمينك أولاً.'); return; }
     final solution = cleanAnswer(riddles[index].answer);
-    if (typed == solution || (solution.contains(typed) && typed.length >= 3)) {
+    if (typed == solution) {
       await AppFeedback.play(SoundCue.correct);
       setState(() { revealed = true; message = 'إجابة صحيحة!'; });
       final first = await awardOnce('riddle_' + index.toString(), 10, widget.onEarn);
@@ -807,5 +815,102 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             FilledButton(onPressed: selected == null ? null : _next, child: Text(index == items.length - 1 ? 'عرض النتيجة' : 'السؤال التالي')),
           ]),
     ),
+  );
+}
+
+// بنك محلي يولّد 1,200 سؤال حسابي مختلف دون إنترنت.
+List<Q> generatedQuestionBank() {
+  final out = <Q>[];
+  for (var a = 2; a <= 41 && out.length < 1200; a++) {
+    for (var b = 2; b <= 41 && out.length < 1200; b++) {
+      final ops = <(String, int)>[('+', a + b), ('-', (a - b).abs()), ('×', a * b)];
+      for (final op in ops) {
+        if (out.length >= 1200) break;
+        final answer = op.$2;
+        final values = <int>{answer};
+        for (var d = 1; values.length < 4; d++) { values.add(answer + d); if (answer - d >= 0) values.add(answer - d); }
+        final choices = values.take(4).map((v) => v.toString()).toList()..shuffle(math.Random(a * 10000 + b * 100 + answer));
+        out.add(Q('احسب: ' + a.toString() + ' ' + op.$1 + ' ' + b.toString() + ' = ؟', choices, choices.indexOf(answer.toString())));
+      }
+    }
+  }
+  return out;
+}
+
+class WordMeaning { final String word, meaning; const WordMeaning(this.word, this.meaning); }
+const wordMeanings = <WordMeaning>[
+  WordMeaning('الشجاعة','الثبات عند مواجهة الصعوبات بحكمة'),
+  WordMeaning('التواضع','عدم التكبر واحترام الآخرين'),
+  WordMeaning('الأمانة','حفظ الحقوق وأداء ما اؤتمن عليه الإنسان'),
+  WordMeaning('المثابرة','الاستمرار في المحاولة والعمل بجد'),
+  WordMeaning('الفضول','الرغبة في المعرفة والاكتشاف'),
+  WordMeaning('التأمل','التفكير الهادئ والعميق'),
+  WordMeaning('الازدهار','النمو والتقدم وتحسن الحال'),
+  WordMeaning('المبادرة','البدء بالفعل دون انتظار طلب'),
+  WordMeaning('الإنصاف','إعطاء كل ذي حق حقه'),
+  WordMeaning('الإبداع','ابتكار أفكار أو أعمال جديدة'),
+  WordMeaning('التعاون','عمل أشخاص معاً لتحقيق هدف مشترك'),
+  WordMeaning('المرونة','القدرة على التكيف مع التغيرات'),
+  WordMeaning('الاستنتاج','الوصول إلى نتيجة اعتماداً على معلومات'),
+  WordMeaning('المصداقية','كون الكلام جديراً بالثقة'),
+  WordMeaning('الاستدامة','استخدام الموارد بما يحافظ عليها للمستقبل'),
+  WordMeaning('الحصافة','حسن التصرف والتفكير السليم'),
+  WordMeaning('الوجيز','قصير مع وضوح المعنى'),
+  WordMeaning('الغزير','الكثير والوفير'),
+  WordMeaning('الشاسع','الواسع جداً'),
+  WordMeaning('المبهم','غير الواضح أو صعب الفهم'),
+  WordMeaning('التراث','ما ورثه المجتمع من عادات وآثار ومعارف'),
+  WordMeaning('المعجم','كتاب يشرح الكلمات ومعانيها'),
+  WordMeaning('المنهج','خطة منظمة للوصول إلى هدف'),
+  WordMeaning('الفرضية','تفسير مبدئي يحتاج إلى اختبار'),
+  WordMeaning('الطاقة','القدرة على بذل شغل أو إحداث تغيير'),
+  WordMeaning('الجاذبية','قوة تجذب الأجسام بعضها نحو بعض'),
+  WordMeaning('الهضبة','أرض مرتفعة سطحها واسع'),
+  WordMeaning('المناخ','متوسط أحوال الطقس خلال مدة طويلة'),
+  WordMeaning('الموطن','المكان الطبيعي الذي يعيش فيه الكائن'),
+  WordMeaning('التوازن','حالة من الاعتدال والاستقرار'),
+  WordMeaning('الندرة','قلة وجود الشيء'),
+  WordMeaning('الوفرة','كثرة وجود الشيء'),
+  WordMeaning('المهارة','القدرة على أداء عمل بإتقان'),
+  WordMeaning('التحليل','تقسيم الموضوع إلى عناصر لفهمه'),
+  WordMeaning('التركيز','توجيه الانتباه إلى أمر محدد'),
+];
+
+class MeaningWordPage extends StatefulWidget {
+  final Future<void> Function(int) onEarn;
+  const MeaningWordPage({super.key, required this.onEarn});
+  @override State<MeaningWordPage> createState() => _MeaningWordPageState();
+}
+class _MeaningWordPageState extends State<MeaningWordPage> {
+  final random = math.Random();
+  late List<int> order;
+  late List<String> options;
+  int index = 0, score = 0;
+  int? selected;
+  bool checked = false;
+  WordMeaning get current => wordMeanings[order[index]];
+  @override void initState() { super.initState(); order = List.generate(wordMeanings.length, (i) => i)..shuffle(random); _options(); }
+  void _options() { final set = <String>{current.meaning}; while (set.length < 4) { set.add(wordMeanings[random.nextInt(wordMeanings.length)].meaning); } options = set.toList()..shuffle(random); selected = null; checked = false; }
+  Future<void> _confirm() async { if (selected == null || checked) return; final ok = options[selected!] == current.meaning; setState(() => checked = true); await AppFeedback.play(ok ? SoundCue.correct : SoundCue.wrong); if (ok) { score++; await awardOnce('meaning_word_' + order[index].toString(), 5, widget.onEarn); } }
+  void _next() { setState(() { if (index == order.length - 1) { order = List.generate(wordMeanings.length, (i) => i)..shuffle(random); index = 0; score = 0; } else { index++; } _options(); }); }
+  @override Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF17283D),
+    appBar: AppBar(backgroundColor: const Color(0xFF28558A), foregroundColor: const Color(0xFFB9D9FF), title: const Text('ما معنى الكلمة؟')),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Container(padding: const EdgeInsets.all(20), decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF28558A), Color(0xFF182C49)]), borderRadius: BorderRadius.circular(22)), child: Column(children: [
+        const Icon(Icons.auto_stories_rounded, size: 44, color: Color(0xFFB9D9FF)),
+        Text('الكلمة ' + (index + 1).toString() + ' من ' + order.length.toString()),
+        Text(current.word, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900)),
+      ])),
+      const SizedBox(height: 18), const Text('اختر المعنى الصحيح:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      ...List.generate(options.length, (i) {
+        final right = options[i] == current.meaning;
+        final color = checked && right ? const Color(0xFF27865E) : checked && selected == i ? const Color(0xFF9B454B) : selected == i ? const Color(0xFF28558A) : const Color(0xFF24364D);
+        return Padding(padding: const EdgeInsets.only(top: 9), child: InkWell(onTap: checked ? null : () => setState(() => selected = i), child: Container(padding: const EdgeInsets.all(15), decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(14)), child: Text(options[i]))));
+      }),
+      if (checked) Padding(padding: const EdgeInsets.all(12), child: Text(options[selected!] == current.meaning ? 'إجابة صحيحة! +5 نقاط' : 'الإجابة الصحيحة: ' + current.meaning, textAlign: TextAlign.center)),
+      FilledButton(onPressed: checked ? _next : selected == null ? null : _confirm, child: Text(checked ? 'الكلمة التالية' : 'تأكيد الإجابة')),
+      Text('نقاط الجولة: ' + score.toString(), textAlign: TextAlign.center),
+    ]),
   );
 }
