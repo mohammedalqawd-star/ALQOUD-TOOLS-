@@ -33,8 +33,8 @@ class GamesHubPage extends StatelessWidget {
       ['ألغاز وذكاء', 'ألغاز كثيرة مع تلميحات وكشف الحل', Icons.psychology_alt, const Color(0xFF9B83E8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => RiddlesPage(onEarn: onEarn)))],
       ['خمن الكلمة', 'اكتشف الكلمة من التلميحات', Icons.lightbulb, const Color(0xFFD49A39), () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuessWordPage(onEarn: onEarn)))],
     ];
-    return Scaffold(
-      appBar: AppBar(title: const Text('الألعاب والتحديات')),
+    return Scaffold(backgroundColor: const Color(0xFF102B36), 
+      appBar: AppBar(backgroundColor: const Color(0xFF15566A), foregroundColor: const Color(0xFF8CE6E0), title: const Text('الألعاب والتحديات')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         Container(
           padding: const EdgeInsets.all(22),
@@ -123,8 +123,8 @@ class QuizLevelsPage extends StatelessWidget {
       ['متوسط','اختبر معلوماتك',Icons.psychology,medium,Color(0xFFE0B84F)],
       ['صعب','تحدَّ معلوماتك',Icons.local_fire_department,hard,Color(0xFFE47A58)],
     ];
-    return Scaffold(
-      appBar: AppBar(title: const Text('مستويات الاختبار')),
+    return Scaffold(backgroundColor: const Color(0xFF251B3D), 
+      appBar: AppBar(backgroundColor: const Color(0xFF49316E), foregroundColor: const Color(0xFFD7B8FF), title: const Text('مستويات الاختبار')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         const Text('كل إجابة صحيحة تمنحك 10 نقاط لأول مرة.', style: TextStyle(color: gold)),
         const SizedBox(height: 12),
@@ -236,8 +236,8 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('التحدي المفتوح')),
+  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF102C3C), 
+    appBar: AppBar(backgroundColor: const Color(0xFF155B78), foregroundColor: const Color(0xFF8BD9FF), title: const Text('التحدي المفتوح')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
       Container(
         padding: const EdgeInsets.all(16),
@@ -347,8 +347,8 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
     else { setState(() { index++; selected = null; feedback = ''; }); }
   }
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(widget.title)),
+  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF1B2442), 
+    appBar: AppBar(backgroundColor: const Color(0xFF344B83), foregroundColor: const Color(0xFFB5C7FF), title: Text(widget.title)),
     body: Padding(padding: const EdgeInsets.all(18), child: finished
       ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.emoji_events, color: gold, size: 72),
@@ -424,8 +424,8 @@ class _RiddlesPageState extends State<RiddlesPage> {
   }
   void next() { setState(() { index = (index + 1) % riddles.length; input.clear(); hint = false; revealed = false; message = ''; }); }
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('ألغاز وذكاء')),
+  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF2C1C3D), 
+    appBar: AppBar(backgroundColor: const Color(0xFF623B79), foregroundColor: const Color(0xFFE0B6FF), title: const Text('ألغاز وذكاء')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
       Text('لغز ' + (index + 1).toString() + ' من ' + riddles.length.toString(), style: const TextStyle(color: gold)),
       const SizedBox(height: 14),
@@ -493,8 +493,8 @@ class _GuessWordPageState extends State<GuessWordPage> {
   }
   void next() { setState(() { index = (index + 1) % words.length; hintLevel = 0; solved = false; message = ''; input.clear(); }); }
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('خمن الكلمة')),
+  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF352518), 
+    appBar: AppBar(backgroundColor: const Color(0xFF765020), foregroundColor: const Color(0xFFFFD18A), title: const Text('خمن الكلمة')),
     body: ListView(padding: const EdgeInsets.all(18), children: [
       Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), gradient: const LinearGradient(colors: [Color(0xFF604A1E), deep])), child: Column(children: [
         const Icon(Icons.question_mark_rounded, color: gold, size: 54),
@@ -564,8 +564,8 @@ class _ChallengesPageState extends State<ChallengesPage> {
   @override
   Widget build(BuildContext context) {
     final t = tasks[today];
-    return Scaffold(
-      appBar: AppBar(title: const Text('التحديات اليومية')),
+    return Scaffold(backgroundColor: const Color(0xFF3A2025), 
+      appBar: AppBar(backgroundColor: const Color(0xFF813C4A), foregroundColor: const Color(0xFFFFB6C4), title: const Text('التحديات اليومية')),
       body: ListView(padding: const EdgeInsets.all(18), children: [
         Container(padding: const EdgeInsets.all(22), decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), gradient: const LinearGradient(colors: [Color(0xFF164E3A), deep]), border: Border.all(color: gold.withOpacity(.7))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Text('تحدي اليوم', style: TextStyle(color: gold, fontWeight: FontWeight.bold)),
@@ -610,8 +610,8 @@ class QuotesPage extends StatelessWidget {
     'الأمل بداية الطريق، والعمل هو الذي يكمله.',
   ];
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('عبارات جميلة')),
+  Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xFF172D3D), 
+    appBar: AppBar(backgroundColor: const Color(0xFF285875), foregroundColor: const Color(0xFFB8E7FF), title: const Text('عبارات جميلة')),
     body: ListView(padding: const EdgeInsets.all(16), children: [
       Container(padding: const EdgeInsets.all(18), decoration: BoxDecoration(color: panel, borderRadius: BorderRadius.circular(18)), child: const Text('كلمات تضيء يومك', style: TextStyle(fontSize: 22, color: gold, fontWeight: FontWeight.bold))),
       const SizedBox(height: 12),
