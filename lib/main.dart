@@ -3,6 +3,7 @@ import 'app_feedback.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'entertainment.dart';
 import 'quotes_page.dart';
+import 'extra_tools.dart';
 
 const gold = Color(0xFFC9A227);
 const green = Color(0xFF073B2B);
@@ -460,6 +461,9 @@ class _ToolsPageState extends State<ToolsPage> {
       ('حاسبة الأقساط', Icons.calendar_month, const InstallmentPage()),
       ('الجملة والتجزئة', Icons.storefront, const WholesalePage()),
       ('الفواتير المحفوظة', Icons.receipt_long, const SavedPage()),
+      ('دفتر المصروفات والإيرادات', Icons.account_balance_wallet_rounded, const ExpenseBookPage()),
+      ('محول الوحدات', Icons.swap_horiz_rounded, const UnitConverterPage()),
+      ('ملاحظاتي السريعة', Icons.sticky_note_2_rounded, const QuickNotesPage()),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFF101D35),
