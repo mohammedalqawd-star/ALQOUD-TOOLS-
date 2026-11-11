@@ -462,10 +462,11 @@ class _ToolsPageState extends State<ToolsPage> {
       ('الفواتير المحفوظة', Icons.receipt_long, const SavedPage()),
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('الأدوات والحاسبات')),
+      backgroundColor: const Color(0xFF101D35),
+      appBar: AppBar(backgroundColor: const Color(0xFF183B63), foregroundColor: const Color(0xFFD8E8FF), title: const Text('الأدوات والحاسبات')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         Card(
-          color: const Color(0xFF153D30),
+          color: const Color(0xFF1A3455),
           child: SwitchListTile(
             secondary: const Icon(Icons.volume_up_rounded, color: gold),
             title: const Text('المؤثرات الصوتية'),
@@ -509,11 +510,18 @@ class _CalcPageState extends State<CalcPage> {
   String result = 'أدخل البيانات ثم اضغط احسب';
   @override
   void dispose() { for (final c in controllers) { c.dispose(); } super.dispose(); }
+  Color get _accent {
+    if (widget.title.contains('الأرباح')) return const Color(0xFF58D6A5);
+    if (widget.title.contains('الخصومات')) return const Color(0xFFFF83A8);
+    if (widget.title.contains('الأقساط')) return const Color(0xFF70B8FF);
+    return const Color(0xFFC19BFF);
+  }
   @override
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
     child: Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      backgroundColor: const Color(0xFF111827),
+      appBar: AppBar(backgroundColor: _accent.withOpacity(.18), foregroundColor: _accent, title: Text(widget.title)),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         ...List.generate(widget.labels.length, (i) => Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -524,7 +532,7 @@ class _CalcPageState extends State<CalcPage> {
           ),
         )),
         FilledButton(
-          style: FilledButton.styleFrom(backgroundColor: gold, foregroundColor: Colors.black),
+          style: FilledButton.styleFrom(backgroundColor: _accent, foregroundColor: const Color(0xFF101522)),
           onPressed: () {
             final values = controllers.map((c) => double.tryParse(c.text.trim()) ?? double.nan).toList();
             if (values.any((v) => !v.isFinite)) { setState(() => result = 'يرجى إدخال أرقام صحيحة في جميع الخانات'); return; }
@@ -533,7 +541,7 @@ class _CalcPageState extends State<CalcPage> {
           child: const Text('احسب'),
         ),
         const SizedBox(height: 16),
-        Card(color: green, child: Padding(padding: const EdgeInsets.all(18), child: SelectableText(result, style: const TextStyle(fontSize: 18, color: Color(0xFFE8D9A0))))),
+        Card(color: green, child: Padding(padding: const EdgeInsets.all(18), child: SelectableText(result, style: TextStyle(fontSize: 18, color: _accent, fontWeight: FontWeight.w700)))),
       ]),
     ),
   );
@@ -617,13 +625,14 @@ class _SavedPageState extends State<SavedPage> {
   Widget build(BuildContext context) => Directionality(
     textDirection: TextDirection.rtl,
     child: Scaffold(
-      appBar: AppBar(title: const Text('الفواتير المحفوظة')),
+      backgroundColor: const Color(0xFF20172F),
+      appBar: AppBar(backgroundColor: const Color(0xFF49316A), foregroundColor: const Color(0xFFE6D5FF), title: const Text('الفواتير المحفوظة')),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         TextField(controller: name, decoration: const InputDecoration(labelText: 'اسم العميل أو الفاتورة')),
         const SizedBox(height: 10),
         TextField(controller: amount, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'المبلغ')),
         const SizedBox(height: 10),
-        FilledButton(onPressed: add, child: const Text('حفظ محلياً')),
+        FilledButton(style: FilledButton.styleFrom(backgroundColor: const Color(0xFFB99AEF), foregroundColor: const Color(0xFF241832)), onPressed: add, child: const Text('حفظ محلياً')),
         const SizedBox(height: 16),
         ...items.asMap().entries.map((e) => Card(child: ListTile(title: Text(e.value), trailing: IconButton(
           icon: const Icon(Icons.delete_outline),
