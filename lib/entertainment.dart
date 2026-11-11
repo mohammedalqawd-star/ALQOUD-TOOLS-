@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'app_feedback.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +62,7 @@ class GamesHubPage extends StatelessWidget {
       _SquareGameCard(title: 'معاني الكلمات', subtitle: 'وسّع مفرداتك', icon: Icons.menu_book_rounded, color: const Color(0xFF83B7FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي 60 ثانية', subtitle: 'كم إجابة تجمع؟', icon: Icons.timer_rounded, color: const Color(0xFFFF8A65), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
     ];
 
     return Scaffold(
@@ -1007,6 +1009,163 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
           ]),
     ),
   );
+}
+
+
+class SpeedChallengePage extends StatefulWidget {
+  final Future<void> Function(int) onEarn;
+  const SpeedChallengePage({super.key, required this.onEarn});
+  @override
+  State<SpeedChallengePage> createState() => _SpeedChallengePageState();
+}
+
+class _SpeedChallengePageState extends State<SpeedChallengePage> {
+  final math.Random random = math.Random();
+  Timer? _timer;
+  late final String _sessionId;
+  late Q current;
+  int seconds = 60, score = 0, answered = 0, bestScore = 0;
+  int? selected;
+  bool finished = false;
+  bool saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionId = DateTime.now().microsecondsSinceEpoch.toString();
+    current = _makeQuestion();
+    _loadBest();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted || finished) { timer.cancel(); return; }
+      if (seconds <= 1) {
+        setState(() => seconds = 0);
+        _finish();
+      } else {
+        setState(() => seconds--);
+      }
+    });
+  }
+
+  Future<void> _loadBest() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => bestScore = prefs.getInt('speed_challenge_best') ?? 0);
+  }
+
+  Q _makeQuestion() {
+    final a = 2 + random.nextInt(28);
+    final b = 2 + random.nextInt(18);
+    final op = random.nextInt(3);
+    final answer = op == 0 ? a + b : op == 1 ? (a - b).abs() : a * b;
+    final symbol = op == 0 ? '+' : op == 1 ? '−' : '×';
+    final values = <int>{answer};
+    while (values.length < 4) {
+      final delta = 1 + random.nextInt(math.max(4, answer ~/ 4 + 4));
+      values.add(random.nextBool() ? answer + delta : math.max(0, answer - delta));
+    }
+    final choices = values.map((v) => v.toString()).toList()..shuffle(random);
+    return Q('كم ناتج $a $symbol $b ؟', choices, choices.indexOf(answer.toString()));
+  }
+
+  Future<void> _answer(int value) async {
+    if (selected != null || finished) return;
+    setState(() { selected = value; answered++; });
+    final correct = value == current.answer;
+    await AppFeedback.play(correct ? SoundCue.correct : SoundCue.wrong);
+    if (correct) {
+      score++;
+      await awardOnce('speed_${_sessionId}_$answered', 3, widget.onEarn);
+    }
+    if (mounted) setState(() {});
+  }
+
+  void _next() {
+    if (finished || selected == null) return;
+    setState(() { current = _makeQuestion(); selected = null; });
+  }
+
+  Future<void> _finish() async {
+    if (finished || saving) return;
+    saving = true;
+    _timer?.cancel();
+    final prefs = await SharedPreferences.getInstance();
+    if (score > bestScore) {
+      bestScore = score;
+      await prefs.setInt('speed_challenge_best', bestScore);
+    }
+    await prefs.setInt('speed_challenge_total', (prefs.getInt('speed_challenge_total') ?? 0) + answered);
+    if (!mounted) return;
+    setState(() { finished = true; saving = false; });
+    await AppFeedback.play(SoundCue.win);
+  }
+
+  @override
+  void dispose() { _timer?.cancel(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xFF30202B),
+    appBar: AppBar(backgroundColor: const Color(0xFF813C4A), foregroundColor: const Color(0xFFFFC3C7), title: const Text('تحدي 60 ثانية')),
+    body: ListView(padding: const EdgeInsets.all(18), children: [
+      Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF9C4855), Color(0xFF42283D)], begin: Alignment.topRight, end: Alignment.bottomLeft), borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0xFFFFC3C7).withOpacity(.35))),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+          _SpeedStat(label: 'الوقت', value: '$seconds', icon: Icons.timer_rounded),
+          _SpeedStat(label: 'النقاط', value: '$score', icon: Icons.bolt_rounded),
+          _SpeedStat(label: 'أفضل نتيجة', value: '$bestScore', icon: Icons.emoji_events_rounded),
+        ]),
+      ),
+      const SizedBox(height: 12),
+      ClipRRect(borderRadius: BorderRadius.circular(20), child: LinearProgressIndicator(value: seconds / 60, minHeight: 8, color: const Color(0xFFFFC3C7), backgroundColor: Colors.white12)),
+      const SizedBox(height: 22),
+      if (finished) ...[
+        Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: const Color(0xFF492D43), borderRadius: BorderRadius.circular(24)), child: Column(children: [
+          const Icon(Icons.emoji_events_rounded, color: Color(0xFFFFD36B), size: 66),
+          const SizedBox(height: 10),
+          const Text('انتهى الوقت!', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 8),
+          Text('أجبت عن $answered سؤالاً، وأجبت بشكل صحيح عن $score.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70, height: 1.5)),
+          const SizedBox(height: 8),
+          Text('أفضل نتيجة: $bestScore', style: const TextStyle(color: Color(0xFFFFC3C7), fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          FilledButton.icon(onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: widget.onEarn))), icon: const Icon(Icons.refresh_rounded), label: const Text('العب مرة أخرى')),
+        ])),
+      ] else ...[
+        Container(padding: const EdgeInsets.all(24), decoration: BoxDecoration(color: const Color(0xFF492D43), borderRadius: BorderRadius.circular(24)), child: Column(children: [
+          const Icon(Icons.flash_on_rounded, color: Color(0xFFFFC3C7), size: 42),
+          const SizedBox(height: 12),
+          Text(current.text, textAlign: TextAlign.center, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
+        ])),
+        const SizedBox(height: 14),
+        ...List.generate(current.choices.length, (i) {
+          final right = i == current.answer;
+          final isSelected = selected == i;
+          final color = selected == null ? const Color(0xFF563747) : right ? const Color(0xFF247A58) : isSelected ? const Color(0xFF9B454B) : const Color(0xFF563747);
+          return Padding(padding: const EdgeInsets.only(bottom: 9), child: SizedBox(height: 54, child: FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: color, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+            onPressed: selected == null ? () => _answer(i) : null,
+            child: Text(current.choices[i], style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
+          )));
+        }),
+        if (selected != null) FilledButton(onPressed: _next, child: const Text('السؤال التالي')),
+        const SizedBox(height: 8),
+        const Text('كل إجابة صحيحة تمنحك 3 نقاط داخل التطبيق. لا توجد خسارة نقاط عند الخطأ.', textAlign: TextAlign.center, style: TextStyle(color: Colors.white60, fontSize: 11)),
+      ],
+    ]),
+  );
+}
+
+class _SpeedStat extends StatelessWidget {
+  final String label, value;
+  final IconData icon;
+  const _SpeedStat({required this.label, required this.value, required this.icon});
+  @override
+  Widget build(BuildContext context) => Column(children: [
+    Icon(icon, color: const Color(0xFFFFC3C7), size: 23),
+    const SizedBox(height: 5),
+    Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+    Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10)),
+  ]);
 }
 
 // بنك محلي يولّد 1,200 سؤال حسابي مختلف دون إنترنت.
