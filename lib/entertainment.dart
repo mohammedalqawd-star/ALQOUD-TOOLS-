@@ -168,8 +168,8 @@ class QuizLevelsPage extends StatelessWidget {
         const SizedBox(height: 12),
         Card(color: const Color(0xFF203B59), child: ListTile(
           leading: const Icon(Icons.library_books_rounded, color: Color(0xFF83B7FF)),
-          title: const Text('بنك الأسئلة • 1,200 سؤال'),
-          subtitle: const Text('أسئلة حسابية متجددة تعمل دون إنترنت'),
+          title: const Text('بنك الأسئلة الحسابية المتجدد'),
+          subtitle: const Text('1200 مسألة محفوظة، أو العب في التحدي المفتوح بلا نهاية'),
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn))),
         )),
         const SizedBox(height: 12),
@@ -214,7 +214,7 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
   final math.Random random = math.Random();
   late Q current;
   late String sessionId;
-  int number = 1, score = 0, correct = 0;
+  int number = 1, score = 0, correct = 0, lifetimeAnswered = 0, bestScore = 0;
   int? selected;
   bool rewarded = false;
   String feedback = '';
@@ -225,6 +225,16 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
     super.initState();
     sessionId = DateTime.now().microsecondsSinceEpoch.toString();
     current = makeQuestion();
+    _loadEndlessStats();
+  }
+
+  Future<void> _loadEndlessStats() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      lifetimeAnswered = prefs.getInt('endless_total_answered') ?? 0;
+      bestScore = prefs.getInt('endless_best_score') ?? 0;
+    });
   }
 
   Q makeQuestion() {
@@ -232,7 +242,7 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
     final int max = difficulty == 'سهل' ? 20 : difficulty == 'متوسط' ? 60 : 120;
     final a = min + random.nextInt(max - min + 1);
     final b = min + random.nextInt(max - min + 1);
-    final op = random.nextInt(difficulty == 'صعب' ? 3 : 2);
+    final op = random.nextInt(difficulty == 'صعب' ? 4 : 3);
     late int answer;
     late String symbol;
     if (op == 0) {
@@ -242,10 +252,15 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
       final high = math.max(a, b), low = math.min(a, b);
       answer = high - low;
       symbol = '−';
-    } else {
+    } else if (op == 2) {
       answer = a * b;
       symbol = '×';
+    } else {
+      answer = a;
+      symbol = '÷';
     }
+    final left = op == 3 ? a * b : a;
+    final right = b;
     final options = <int>{answer};
     while (options.length < 4) {
       final delta = 1 + random.nextInt(math.max(5, answer.abs() ~/ 3 + 5));
@@ -253,16 +268,23 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
       options.add(candidate);
     }
     final choices = options.map((v) => v.toString()).toList()..shuffle(random);
-    return Q('كم ناتج $a $symbol $b ؟', choices, choices.indexOf(answer.toString()));
+    return Q('كم ناتج $left $symbol $right ؟', choices, choices.indexOf(answer.toString()));
   }
 
   Future<void> choose(int value) async {
     if (selected != null) return;
     setState(() => selected = value);
+    final prefs = await SharedPreferences.getInstance();
+    lifetimeAnswered = (prefs.getInt('endless_total_answered') ?? 0) + 1;
+    await prefs.setInt('endless_total_answered', lifetimeAnswered);
     if (value == current.answer) {
       await AppFeedback.play(SoundCue.correct);
       correct++;
       score += 5;
+      if (score > bestScore) {
+        bestScore = score;
+        await prefs.setInt('endless_best_score', bestScore);
+      }
       final first = await awardOnce('endless_${sessionId}_$number', 5, widget.onEarn);
       if (mounted) setState(() {
         rewarded = first;
@@ -298,11 +320,12 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
         child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('جولات متجددة', style: TextStyle(color: gold, fontWeight: FontWeight.bold)),
-            Text('السؤال رقم $number', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+            Text('السؤال رقم $number • بلا نهاية', style: const TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
           ]),
           Column(children: [
             const Icon(Icons.stars, color: gold, size: 28),
             Text('$score نقطة', style: const TextStyle(color: gold, fontWeight: FontWeight.bold)),
+          Text('أفضل نتيجة: $bestScore', style: const TextStyle(color: Colors.white70, fontSize: 11)),
           ]),
         ]),
       ),
@@ -356,7 +379,7 @@ class _EndlessQuizPageState extends State<EndlessQuizPage> {
         label: const Text('السؤال التالي'),
       ),
       const SizedBox(height: 8),
-      Text('إجابات صحيحة: $correct • كل سؤال جديد يُنشأ تلقائياً. النقاط إنجاز افتراضي داخل التطبيق.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+      Text('إجابات صحيحة: $correct • أجبت عن $lifetimeAnswered سؤالاً إجمالاً. تُنشأ مسائل جديدة تلقائياً بلا حد عملياً، وتُحفظ إحصاءاتك على هذا الجهاز.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 12)),
     ]),
   );
 }
