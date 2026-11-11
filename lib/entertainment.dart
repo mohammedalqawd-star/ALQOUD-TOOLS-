@@ -213,7 +213,7 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [Icon(Icons.auto_awesome_rounded, color: widget.accent), const SizedBox(width: 8), Text('مهمة التحدي', style: TextStyle(color: widget.accent, fontWeight: FontWeight.w900))]),
           const SizedBox(height: 17),
-          Text(prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.6)),
+          Text(widget.kind == 'focus' && !revealed ? '• • • • •' : prompt, textAlign: TextAlign.center, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, height: 1.6)),
           const SizedBox(height: 12),
           Text(extra, style: const TextStyle(color: Colors.white70, height: 1.5)),
           if (widget.kind == 'laugh' && revealed && !completed) ...[
