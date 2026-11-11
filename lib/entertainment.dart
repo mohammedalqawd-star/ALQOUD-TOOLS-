@@ -49,51 +49,128 @@ String cleanAnswer(String s) => s.trim().toLowerCase()
 class GamesHubPage extends StatelessWidget {
   final Future<void> Function(int) onEarn;
   const GamesHubPage({super.key, required this.onEarn});
+
   @override
   Widget build(BuildContext context) {
-    final games = [
-      ['اختبارات المعلومات', 'ثلاثة مستويات: سهل ومتوسط وصعب', Icons.quiz, const Color(0xFF48B887), () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizLevelsPage(onEarn: onEarn)))],
-      ['ألغاز وذكاء', 'ألغاز كثيرة مع تلميحات وكشف الحل', Icons.psychology_alt, const Color(0xFF9B83E8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => RiddlesPage(onEarn: onEarn)))],
-      ['خمن الكلمة', 'اكتشف الكلمة من التلميحات', Icons.lightbulb, const Color(0xFFD49A39), () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuessWordPage(onEarn: onEarn)))],
-      ['لعبة الذاكرة', 'طابق البطاقات واختبر ذاكرتك', Icons.grid_view_rounded, const Color(0xFF56C7D8), () => Navigator.push(context, MaterialPageRoute(builder: (_) => MemoryPairsPage(onEarn: onEarn)))],
-      ['صح أم خطأ', 'أسئلة سريعة ومعلومات متنوعة', Icons.fact_check_rounded, const Color(0xFFFF8A80), () => Navigator.push(context, MaterialPageRoute(builder: (_) => TrueFalsePage(onEarn: onEarn)))],
-      ['ما معنى الكلمة؟', 'اختر المعنى الصحيح للكلمة العربية', Icons.menu_book_rounded, const Color(0xFF83B7FF), () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))],
+    final cards = <_SquareGameCard>[
+      _SquareGameCard(title: 'اختبارات المعلومات', subtitle: 'ثلاثة مستويات', icon: Icons.quiz_rounded, color: const Color(0xFF38B887), tag: 'معرفة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizLevelsPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'ألغاز وذكاء', subtitle: 'فكّر واكتشف الحل', icon: Icons.psychology_alt_rounded, color: const Color(0xFF9B83E8), tag: 'تفكير', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => RiddlesPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'خمن الكلمة', subtitle: 'اكتشفها من التلميح', icon: Icons.lightbulb_rounded, color: const Color(0xFFD49A39), tag: 'تخمين', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GuessWordPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'لعبة الذاكرة', subtitle: 'طابق البطاقات', icon: Icons.grid_view_rounded, color: const Color(0xFF56C7D8), tag: 'ذاكرة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MemoryPairsPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'صح أم خطأ', subtitle: 'قرّر بسرعة', icon: Icons.fact_check_rounded, color: const Color(0xFFFF8A80), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TrueFalsePage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'معاني الكلمات', subtitle: 'وسّع مفرداتك', icon: Icons.menu_book_rounded, color: const Color(0xFF83B7FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
     ];
-    return Scaffold(backgroundColor: const Color(0xFF102B36), 
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF102B36),
       appBar: AppBar(backgroundColor: const Color(0xFF15566A), foregroundColor: const Color(0xFF8CE6E0), title: const Text('الألعاب والتحديات')),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
-        Container(
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(colors: [Color(0xFF176247), deep], begin: Alignment.topRight, end: Alignment.bottomLeft),
-            border: Border.all(color: gold.withOpacity(.7)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+        children: [
+          Container(
+            padding: const EdgeInsets.all(21),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              gradient: const LinearGradient(colors: [Color(0xFF176247), Color(0xFF071B16)], begin: Alignment.topRight, end: Alignment.bottomLeft),
+              border: Border.all(color: gold.withOpacity(.65)),
+              boxShadow: [BoxShadow(color: const Color(0xFF0B9B65).withOpacity(.16), blurRadius: 22, offset: const Offset(0, 9))],
+            ),
+            child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [Icon(Icons.auto_awesome_rounded, color: gold, size: 18), SizedBox(width: 7), Text('ALQOUD • GAME ZONE', style: TextStyle(color: gold, letterSpacing: 1.2, fontWeight: FontWeight.w900, fontSize: 12))]),
+              SizedBox(height: 12),
+              Text('اختر لعبتك المفضلة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+              SizedBox(height: 6),
+              Text('ثمانية تحديات متنوعة؛ العب، اجمع النقاط، واكتشف مهارات جديدة.', style: TextStyle(color: Colors.white70, height: 1.5, fontSize: 12)),
+            ]),
           ),
-          child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('ALQOUD • GAME ZONE', style: TextStyle(color: gold, letterSpacing: 1.5, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text('فكّر، خمن، واكتشف!', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
-            SizedBox(height: 7),
-            Text('كل يوم فرصة جديدة لتجربة لعبة وتحدي نفسك.'),
+          const SizedBox(height: 22),
+          Row(children: [
+            const Expanded(child: Text('كل الألعاب', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900))),
+            Text('٨ تصنيفات', style: TextStyle(color: Colors.white.withOpacity(.55), fontSize: 11)),
           ]),
-        ),
-        const SizedBox(height: 18),
-        ...games.map((g) => Card(
-          color: panel,
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            leading: CircleAvatar(backgroundColor: (g[3] as Color).withOpacity(.18), child: Icon(g[2] as IconData, color: g[3] as Color)),
-            title: Text(g[0] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(g[1] as String),
-            trailing: const Icon(Icons.arrow_back_ios_new, color: gold, size: 17),
-            onTap: g[4] as VoidCallback,
+          const SizedBox(height: 12),
+          GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: .94,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: cards,
           ),
-        )),
-        const SizedBox(height: 8),
-        const Text('النقاط رصيد إنجاز داخل التطبيق فقط، وليست أموالاً ولا تُستخدم للمراهنة.', style: TextStyle(color: Colors.white60, fontSize: 12)),
-      ]),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(color: Colors.white.withOpacity(.045), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white10)),
+            child: const Row(children: [
+              Icon(Icons.info_outline_rounded, color: gold, size: 20),
+              SizedBox(width: 9),
+              Expanded(child: Text('النقاط رصيد إنجاز افتراضي داخل التطبيق فقط، وليست أموالاً ولا تُستخدم للمراهنة.', style: TextStyle(color: Colors.white60, fontSize: 11, height: 1.5))),
+            ]),
+          ),
+        ],
+      ),
     );
   }
+}
+
+class _SquareGameCard extends StatelessWidget {
+  final String title, subtitle, tag;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  const _SquareGameCard({required this.title, required this.subtitle, required this.icon, required this.color, required this.tag, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    child: InkWell(
+      borderRadius: BorderRadius.circular(23),
+      onTap: onTap,
+      child: Ink(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(23),
+          gradient: LinearGradient(
+            colors: [color.withOpacity(.27), const Color(0xFF12242D), const Color(0xFF0D1D26)],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+          border: Border.all(color: color.withOpacity(.42), width: 1.1),
+          boxShadow: [BoxShadow(color: color.withOpacity(.10), blurRadius: 15, offset: const Offset(0, 7))],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Container(
+                  width: 49, height: 49,
+                  decoration: BoxDecoration(color: color.withOpacity(.18), borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withOpacity(.35))),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: color.withOpacity(.13), borderRadius: BorderRadius.circular(20)),
+                  child: Text(tag, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800)),
+                ),
+              ]),
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, height: 1.3)),
+                const SizedBox(height: 5),
+                Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white60, fontSize: 10)),
+                const SizedBox(height: 9),
+                Row(children: [Text('ابدأ اللعب', style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 10)), const SizedBox(width: 5), Icon(Icons.arrow_back_rounded, color: color, size: 15)]),
+              ]),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class Q {
