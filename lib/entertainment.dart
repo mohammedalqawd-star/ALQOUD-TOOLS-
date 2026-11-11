@@ -273,7 +273,7 @@ class _StageLevelsPageState extends State<StageLevelsPage> {
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
     if (!mounted) return;
-    setState(() { completed = (p.getInt('completed_${widget.stageKey}') ?? 0).clamp(0, totalStages); ready = true; });
+    setState(() { completed = (p.getInt('completed_${widget.stageKey}') ?? 0).clamp(0, totalStages).toInt(); ready = true; });
   }
   Future<void> _openStage(int stage) async {
     if (stage != completed + 1 || stage > totalStages) return;
