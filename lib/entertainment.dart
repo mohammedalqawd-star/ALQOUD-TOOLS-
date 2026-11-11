@@ -181,6 +181,36 @@ class Q {
   final int answer;
   const Q(this.text, this.choices, this.answer);
 }
+
+List<Q> _stageQuestionsFromPairs(List<(String, String)> pairs, int seed) {
+  final answers = pairs.map((p) => p.$2).toSet().toList();
+  return List<Q>.generate(pairs.length, (i) {
+    final correct = pairs[i].$2;
+    final distractors = answers.where((a) => a != correct).toList()..shuffle(math.Random(seed + i * 37));
+    final choices = <String>[correct, ...distractors.take(3)]..shuffle(math.Random(seed + i * 101));
+    return Q(pairs[i].$1, choices, choices.indexOf(correct));
+  });
+}
+
+List<Q> riddleStageQuestions() => _stageQuestionsFromPairs(
+  riddles.map((r) => ('${r.question} (اختر الحل الصحيح)', r.answer)).toList(), 311);
+List<Q> wordStageQuestions() => _stageQuestionsFromPairs(
+  words.map((w) => ('ما الكلمة التي يصفها هذا التلميح؟ ${w.hint1}', w.word)).toList(), 733);
+List<Q> meaningStageQuestions() => _stageQuestionsFromPairs(
+  wordMeanings.map((w) => ('ما معنى كلمة «${w.word}»؟', w.meaning)).toList(), 997);
+List<Q> trueFalseStageQuestions() {
+  const statements = <(String, bool)>[
+    ('الشمس نجم وليست كوكباً.', true), ('عدد أضلاع المربع خمسة.', false),
+    ('القمر يعكس ضوء الشمس.', true), ('الخفاش من الطيور.', false),
+    ('المحيط الهادئ أكبر محيطات الأرض.', true), ('العدد 11 عدد زوجي.', false),
+    ('النحلة تصنع العسل.', true), ('الصوت ينتقل في الفراغ.', false),
+    ('النباتات تقوم بالبناء الضوئي.', true), ('المريخ أكبر من المشتري.', false),
+  ];
+  return statements.map((item) {
+    const choices = ['صح', 'خطأ', 'كلاهما', 'لا يمكن تحديد ذلك'];
+    return Q(item.$1, choices, item.$2 ? 0 : 1);
+  }).toList();
+}
 const easy = <Q>[
   Q('كم عدد أيام الأسبوع؟', ['5','6','7','8'], 2),
   Q('ما عاصمة اليمن؟', ['صنعاء','عدن','تعز','إب'], 0),
@@ -227,6 +257,10 @@ class QuizLevelsPage extends StatelessWidget {
     final cards = <_SquareGameCard>[
       _SquareGameCard(title: 'مراحل المعلومات', subtitle: '1000 مرحلة • 10 أسئلة لكل مرحلة', icon: Icons.school_rounded, color: const Color(0xFF48B887), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'اختبار المعلومات', stageKey: 'info_stages', questions: [...easy, ...medium, ...hard], accent: const Color(0xFF48B887), onEarn: onEarn)))),
       _SquareGameCard(title: 'مراحل الحساب والذكاء', subtitle: '1000 مرحلة • 10 أسئلة لكل مرحلة', icon: Icons.calculate_rounded, color: const Color(0xFF83B7FF), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'الحساب والذكاء', stageKey: 'math_stages', questions: generatedQuestionBank(), accent: const Color(0xFF83B7FF), onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل الألغاز', subtitle: '1000 مرحلة • 10 أسئلة', icon: Icons.extension_rounded, color: const Color(0xFFB18AE8), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'الألغاز والذكاء', stageKey: 'riddle_stages', questions: riddleStageQuestions(), accent: const Color(0xFFB18AE8), onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل تخمين الكلمات', subtitle: '1000 مرحلة • 10 أسئلة', icon: Icons.lightbulb_rounded, color: const Color(0xFFE0B84F), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'تخمين الكلمات', stageKey: 'word_stages', questions: wordStageQuestions(), accent: const Color(0xFFE0B84F), onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل معاني الكلمات', subtitle: '1000 مرحلة • 10 أسئلة', icon: Icons.menu_book_rounded, color: const Color(0xFF56C7D8), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'معاني الكلمات', stageKey: 'meaning_stages', questions: meaningStageQuestions(), accent: const Color(0xFF56C7D8), onEarn: onEarn)))),
+      _SquareGameCard(title: 'مراحل صح أم خطأ', subtitle: '1000 مرحلة • 10 أسئلة', icon: Icons.fact_check_rounded, color: const Color(0xFFFF8A80), tag: '1000 مرحلة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StageLevelsPage(title: 'صح أم خطأ', stageKey: 'true_false_stages', questions: trueFalseStageQuestions(), accent: const Color(0xFFFF8A80), onEarn: onEarn)))),
       _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة حسابية بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'اختبار اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFD7B8FF), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'اختبار اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
     ];
