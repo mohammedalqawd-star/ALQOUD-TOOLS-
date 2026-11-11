@@ -150,6 +150,23 @@ class QuizLevelsPage extends StatelessWidget {
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'بنك الأسئلة', questions: generatedQuestionBank(), levelKey: 'bank_1200', onEarn: onEarn))),
         )),
         const SizedBox(height: 12),
+        Card(color: const Color(0xFF49316E), child: ListTile(
+          leading: const Icon(Icons.today_rounded, color: Color(0xFFD7B8FF), size: 30),
+          title: const Text('اختبار اليوم • 10 أسئلة', style: TextStyle(fontWeight: FontWeight.bold)),
+          subtitle: const Text('تحدٍّ جديد يتغير تلقائياً كل يوم'),
+          trailing: const Icon(Icons.play_circle_fill, color: Color(0xFFD7B8FF)),
+          onTap: () {
+            final day = DateTime.now().difference(DateTime(2024, 1, 1)).inDays;
+            final bank = generatedQuestionBank();
+            final start = (day * 10) % (bank.length - 10);
+            Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(
+              title: 'اختبار اليوم', questions: bank.skip(start).take(10).toList(),
+              levelKey: 'daily_' + DateTime.now().toIso8601String().substring(0, 10),
+              onEarn: onEarn,
+            )));
+          },
+        )),
+        const SizedBox(height: 12),
         ...levels.map((l) => Card(color: panel, child: ListTile(
           contentPadding: const EdgeInsets.all(16),
           leading: CircleAvatar(backgroundColor: (l[4] as Color).withOpacity(.18), child: Icon(l[2] as IconData, color: l[4] as Color)),
@@ -422,6 +439,7 @@ class _RiddlesPageState extends State<RiddlesPage> {
   @override
   void dispose() { input.dispose(); super.dispose(); }
   Future<void> check() async {
+    if (revealed) return;
     final typed = cleanAnswer(input.text);
     if (typed.isEmpty) { setState(() => message = 'اكتب تخمينك أولاً.'); return; }
     final solution = cleanAnswer(riddles[index].answer);
@@ -487,6 +505,7 @@ class _GuessWordPageState extends State<GuessWordPage> {
   @override
   void dispose() { input.dispose(); super.dispose(); }
   Future<void> submit() async {
+    if (solved) return;
     if (cleanAnswer(input.text) == cleanAnswer(words[index].word)) {
       await AppFeedback.play(SoundCue.correct);
       setState(() { solved = true; message = 'إجابة ممتازة!'; });
