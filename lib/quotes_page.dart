@@ -55,7 +55,7 @@ class QuoteLibraryPage extends StatefulWidget {
 }
 
 class _QuoteLibraryPageState extends State<QuoteLibraryPage> {
-  static const _categories = ['الكل', 'تحفيز', 'نجاح', 'حكمة', 'أخلاق', 'أمل', 'علم', 'المفضلة'];
+  static const _categories = ['الكل', 'تحفيز', 'نجاح', 'حكمة', 'أخلاق', 'أمل', 'علم', 'صداقة', 'عائلة', 'عمل', 'سعادة', 'المفضلة'];
   String selected = 'الكل';
   Set<String> favorites = <String>{};
   Set<String> seenQuotes = <String>{};
