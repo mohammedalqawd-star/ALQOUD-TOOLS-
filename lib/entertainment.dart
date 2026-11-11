@@ -844,24 +844,35 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
     ('المريخ أكبر من المشتري.', false),
   ];
   int index = 0, score = 0;
+  List<int> order = [];
+  bool ready = false;
   bool? selected;
   bool finished = false;
   String feedback = '';
 
+  @override
+  void initState() { super.initState(); _loadQuestions(); }
+  Future<void> _loadQuestions() async {
+    final unseen = await loadUnseenOrder('seen_true_false', items.length);
+    if (!mounted) return;
+    setState(() { order = unseen; ready = true; });
+  }
+
   Future<void> _answer(bool answer) async {
-    if (selected != null) return;
-    final correct = answer == items[index].$2;
+    if (selected != null || !ready) return;
+    final correct = answer == items[order[index]].$2;
     setState(() {
       selected = answer;
       if (correct) score++;
-      feedback = correct ? 'إجابة صحيحة!' : 'الإجابة الصحيحة: ' + (items[index].$2 ? 'صح' : 'خطأ');
+      feedback = correct ? 'إجابة صحيحة!' : 'الإجابة الصحيحة: ' + (items[order[index]].$2 ? 'صح' : 'خطأ');
     });
     await AppFeedback.play(correct ? SoundCue.correct : SoundCue.wrong);
-    if (correct) await awardOnce('true_false_$index', 5, widget.onEarn);
+    await markItemSeen('seen_true_false', order[index]);
+    if (correct) await awardOnce('true_false_' + order[index].toString(), 5, widget.onEarn);
   }
 
   void _next() {
-    if (index == items.length - 1) {
+    if (index == order.length - 1) {
       setState(() => finished = true);
       AppFeedback.play(SoundCue.win);
     } else {
@@ -870,7 +881,9 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => !ready
+    ? const Scaffold(backgroundColor: Color(0xFF30202B), body: Center(child: CircularProgressIndicator()))
+    : Scaffold(
     backgroundColor: const Color(0xFF30202B),
     appBar: AppBar(backgroundColor: const Color(0xFF813C4A), foregroundColor: const Color(0xFFFFC3C7), title: const Text('صح أم خطأ')),
     body: Padding(
@@ -883,14 +896,14 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             FilledButton(onPressed: () => Navigator.pop(context), child: const Text('العودة للألعاب')),
           ]))
         : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            LinearProgressIndicator(value: (index + 1) / items.length, color: const Color(0xFFFF9AA5)),
+            LinearProgressIndicator(value: (index + 1) / order.length, color: const Color(0xFFFF9AA5)),
             const SizedBox(height: 18),
             Text('السؤال ' + (index + 1).toString() + ' من ' + items.length.toString(), textAlign: TextAlign.center),
             const SizedBox(height: 20),
             Expanded(child: Container(
               padding: const EdgeInsets.all(22),
               decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF713B52), Color(0xFF3A2739)]), borderRadius: BorderRadius.circular(24)),
-              child: Center(child: Text(items[index].$1, textAlign: TextAlign.center, style: const TextStyle(fontSize: 25, height: 1.5, fontWeight: FontWeight.bold))),
+              child: Center(child: Text(items[order[index]].$1, textAlign: TextAlign.center, style: const TextStyle(fontSize: 25, height: 1.5, fontWeight: FontWeight.bold))),
             )),
             const SizedBox(height: 16),
             Row(children: [
