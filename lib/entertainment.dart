@@ -61,16 +61,14 @@ class GamesHubPage extends StatelessWidget {
       _SquareGameCard(title: 'صح أم خطأ', subtitle: 'قرّر بسرعة', icon: Icons.fact_check_rounded, color: const Color(0xFFFF8A80), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => TrueFalsePage(onEarn: onEarn)))),
       _SquareGameCard(title: 'معاني الكلمات', subtitle: 'وسّع مفرداتك', icon: Icons.menu_book_rounded, color: const Color(0xFF83B7FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeaningWordPage(onEarn: onEarn)))),
       _SquareGameCard(title: 'التحدي المفتوح', subtitle: 'أسئلة بلا نهاية', icon: Icons.all_inclusive_rounded, color: const Color(0xFF4DD0A1), tag: 'مستمر', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => EndlessQuizPage(onEarn: onEarn)))),
-      _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة متجددة', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: 'daily_1200_pool', questionLimit: 10, onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الضحك', subtitle: 'نكت خفيفة ومواقف طريفة', icon: Icons.sentiment_very_satisfied_rounded, color: const Color(0xFFFFB74D), tag: 'مرح', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'laugh', title: 'تحدي الضحك', accent: const Color(0xFFFFB74D), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الخيال', subtitle: 'أطلق أفكارك واكتب حكايتك', icon: Icons.auto_awesome_rounded, color: const Color(0xFFBA9BFF), tag: 'إبداع', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'imagination', title: 'تحدي الخيال', accent: const Color(0xFFBA9BFF), onEarn: onEarn)))),
-      _SquareGameCard(title: 'تحدي السرعة', subtitle: '30 ثانية لاتخاذ القرار', icon: Icons.bolt_rounded, color: const Color(0xFFFF8066), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
+      _SquareGameCard(title: 'تحدي السرعة', subtitle: '60 ثانية لاتخاذ القرار', icon: Icons.bolt_rounded, color: const Color(0xFFFF8066), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي المجاملة', subtitle: 'اختر كلمة طيبة وشاركها', icon: Icons.volunteer_activism_rounded, color: const Color(0xFFFF8EBA), tag: 'كلمات طيبة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'compliment', title: 'تحدي المجاملة', accent: const Color(0xFFFF8EBA), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي التركيز', subtitle: 'احفظ الرمز ثم اكتبه', icon: Icons.center_focus_strong_rounded, color: const Color(0xFF62D6C5), tag: 'تركيز', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'focus', title: 'تحدي التركيز', accent: const Color(0xFF62D6C5), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الحروف', subtitle: 'رتب الحروف واكتشف الكلمة', icon: Icons.abc_rounded, color: const Color(0xFF82B8FF), tag: 'لغة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'letters', title: 'تحدي الحروف', accent: const Color(0xFF82B8FF), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الوصف', subtitle: 'اكتشف الشيء من أوصافه', icon: Icons.search_rounded, color: const Color(0xFF8DD17E), tag: 'تخمين', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MiniChallengePage(kind: 'description', title: 'تحدي الوصف', accent: const Color(0xFF8DD17E), onEarn: onEarn)))),
       _SquareGameCard(title: 'تحدي الحسابات', subtitle: 'مسائل تتدرج في الصعوبة', icon: Icons.calculate_rounded, color: const Color(0xFF69B7E8), tag: 'حساب', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
-      _SquareGameCard(title: 'تحدي اليوم', subtitle: '10 أسئلة جديدة كل يوم', icon: Icons.today_rounded, color: const Color(0xFFFFC15A), tag: 'يومي', onTap: () { final now = DateTime.now(); final key = 'daily_${now.year}_${now.month}_${now.day}'; Navigator.push(context, MaterialPageRoute(builder: (_) => QuizPlayPage(title: 'تحدي اليوم', questions: generatedQuestionBank(), levelKey: key, questionLimit: 10, onEarn: onEarn))); }),
       _SquareGameCard(title: 'تحدي 60 ثانية', subtitle: 'كم إجابة تجمع؟', icon: Icons.timer_rounded, color: const Color(0xFFFF8A65), tag: 'سرعة', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SpeedChallengePage(onEarn: onEarn)))),
     ];
 
@@ -221,8 +219,9 @@ class _MiniChallengePageState extends State<MiniChallengePage> {
           if (widget.kind == 'laugh' && revealed && !completed) ...[
             const SizedBox(height: 14),
             FilledButton(onPressed: () => setState(() => revealed = false), child: const Text('اكشف النهاية الطريفة')),
-            if (!revealed) Text(answer, style: TextStyle(color: widget.accent, fontSize: 18, fontWeight: FontWeight.bold)),
           ],
+          if (widget.kind == 'laugh' && !revealed)
+            Padding(padding: const EdgeInsets.only(top: 12), child: Text(answer, style: TextStyle(color: widget.accent, fontSize: 18, fontWeight: FontWeight.bold))),
           if (widget.kind == 'focus') ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(onPressed: () => setState(() => revealed = !revealed), icon: Icon(revealed ? Icons.visibility_off : Icons.visibility), label: Text(revealed ? 'إخفاء الأرقام' : 'إظهار الأرقام')),
