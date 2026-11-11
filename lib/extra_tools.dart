@@ -852,3 +852,164 @@ class _QuickNotesPageState extends State<QuickNotesPage> {
     ]),
   );
 }
+
+
+class AchievementsPage extends StatefulWidget {
+  const AchievementsPage({super.key});
+  @override
+  State<AchievementsPage> createState() => _AchievementsPageState();
+}
+
+class _AchievementsPageState extends State<AchievementsPage> {
+  int points = 0;
+  int solvedActivities = 0;
+  int completedDays = 0;
+  int streak = 0;
+  bool loading = true;
+
+  String _dateKey(DateTime date) =>
+      '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final events = prefs.getStringList('earned_events') ?? [];
+    final keys = prefs.getKeys();
+    final days = keys.where((key) => key.startsWith('daily_done_') && prefs.getBool(key) == true).length;
+    var cursor = DateTime.now();
+    if (!(prefs.getBool('daily_done_${_dateKey(cursor)}') ?? false)) {
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    var currentStreak = 0;
+    while (currentStreak < 3650 && (prefs.getBool('daily_done_${_dateKey(cursor)}') ?? false)) {
+      currentStreak++;
+      cursor = cursor.subtract(const Duration(days: 1));
+    }
+    if (!mounted) return;
+    setState(() {
+      points = prefs.getInt('game_points') ?? 0;
+      solvedActivities = events.length;
+      completedDays = days;
+      streak = currentStreak;
+      loading = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final badges = <_AchievementBadge>[
+      _AchievementBadge('أول خطوة', 'اجمع 10 نقاط', Icons.flag_rounded, points >= 10),
+      _AchievementBadge('متعلّم نشيط', 'اجمع 100 نقطة', Icons.menu_book_rounded, points >= 100),
+      _AchievementBadge('مبدع', 'اجمع 300 نقطة', Icons.lightbulb_rounded, points >= 300),
+      _AchievementBadge('أسطورة', 'اجمع 700 نقطة', Icons.workspace_premium_rounded, points >= 700),
+      _AchievementBadge('جامع الإنجازات', 'أكمل 10 أنشطة', Icons.stars_rounded, solvedActivities >= 10),
+      _AchievementBadge('مستمر', 'أكمل 3 تحديات يومية', Icons.calendar_month_rounded, completedDays >= 3),
+      _AchievementBadge('أسبوع من التحدي', 'حافظ على سلسلة 7 أيام', Icons.local_fire_department_rounded, streak >= 7),
+      _AchievementBadge('ألف نقطة', 'اجمع 1000 نقطة', Icons.military_tech_rounded, points >= 1000),
+    ];
+    final unlocked = badges.where((b) => b.unlocked).length;
+    return Scaffold(
+      backgroundColor: const Color(0xFF202A3B),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF354A70),
+        foregroundColor: const Color(0xFFD5E3FF),
+        title: const Text('إنجازاتي وشاراتي'),
+        actions: [IconButton(tooltip: 'تحديث', onPressed: _load, icon: const Icon(Icons.refresh))],
+      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(padding: const EdgeInsets.all(16), children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF3B5C91), Color(0xFF252F50)]),
+                  borderRadius: BorderRadius.circular(23),
+                  border: Border.all(color: const Color(0xFFB9D0FF).withOpacity(.35)),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('رحلتك حتى الآن', style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 8),
+                  Text('$unlocked / ${badges.length} شارات مفتوحة', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 14),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: LinearProgressIndicator(
+                      value: unlocked / badges.length,
+                      minHeight: 9,
+                      color: const Color(0xFFD5E3FF),
+                      backgroundColor: Colors.black.withOpacity(.2),
+                    ),
+                  ),
+                ]),
+              ),
+              const SizedBox(height: 14),
+              GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 1.35,
+                children: [
+                  _AchievementStat(label: 'النقاط', value: '$points', icon: Icons.stars_rounded, color: const Color(0xFFFFD66E)),
+                  _AchievementStat(label: 'الأنشطة المكتملة', value: '$solvedActivities', icon: Icons.task_alt_rounded, color: const Color(0xFF8DE2C1)),
+                  _AchievementStat(label: 'أيام التحدي', value: '$completedDays', icon: Icons.event_available_rounded, color: const Color(0xFFFFA6C2)),
+                  _AchievementStat(label: 'السلسلة الحالية', value: '$streak يوم', icon: Icons.local_fire_department_rounded, color: const Color(0xFFFFB36D)),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text('مجموعة الشارات', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 10),
+              ...badges.map((badge) => Card(
+                color: badge.unlocked ? const Color(0xFF344A65) : const Color(0xFF293244),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: badge.unlocked ? const Color(0xFF5277A8) : Colors.white10,
+                    child: Icon(badge.icon, color: badge.unlocked ? const Color(0xFFD5E3FF) : Colors.white38),
+                  ),
+                  title: Text(badge.title, style: TextStyle(fontWeight: FontWeight.bold, color: badge.unlocked ? Colors.white : Colors.white60)),
+                  subtitle: Text(badge.description),
+                  trailing: Icon(badge.unlocked ? Icons.verified_rounded : Icons.lock_outline_rounded, color: badge.unlocked ? const Color(0xFF8DE2C1) : Colors.white30),
+                ),
+              )),
+              const SizedBox(height: 8),
+              const Text('تُحسب الشارات من إنجازاتك المحفوظة على هذا الجهاز.', style: TextStyle(color: Colors.white54, fontSize: 11)),
+            ]),
+    );
+  }
+}
+
+class _AchievementBadge {
+  final String title;
+  final String description;
+  final IconData icon;
+  final bool unlocked;
+  const _AchievementBadge(this.title, this.description, this.icon, this.unlocked);
+}
+
+class _AchievementStat extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color color;
+  const _AchievementStat({required this.label, required this.value, required this.icon, required this.color});
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(13),
+    decoration: BoxDecoration(color: const Color(0xFF303E56), borderRadius: BorderRadius.circular(18), border: Border.all(color: color.withOpacity(.2))),
+    child: Row(children: [
+      Icon(icon, color: color, size: 24),
+      const SizedBox(width: 9),
+      Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+        const SizedBox(height: 4),
+        Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 18)),
+      ])),
+    ]),
+  );
+}
