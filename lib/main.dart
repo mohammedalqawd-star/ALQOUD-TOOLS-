@@ -5,6 +5,8 @@ import 'entertainment.dart';
 import 'quotes_page.dart';
 import 'extra_tools.dart';
 import 'language_learning.dart';
+import 'extra_fun.dart';
+import 'quran_page.dart';
 
 const gold = Color(0xFFC9A227);
 const green = Color(0xFF073B2B);
@@ -507,6 +509,8 @@ class _ToolsPageState extends State<ToolsPage> {
       ('محول الوحدات', Icons.swap_horiz_rounded, const UnitConverterPage()),
       ('ملاحظاتي السريعة', Icons.sticky_note_2_rounded, const QuickNotesPage()),
       ('إنجازاتي وشاراتي', Icons.workspace_premium_rounded, const AchievementsPage()),
+      ('عالم المرح والثقافة', Icons.celebration_rounded, const FunLibraryPage()),
+      ('القرآن الكريم', Icons.menu_book_rounded, const QuranPage()),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFF101D35),
