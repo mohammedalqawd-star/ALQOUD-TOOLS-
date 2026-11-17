@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const gold=Color(0xFFFFD77A);
 const languages=[
- ['en','الإنجليزية','English','🇬🇧','en-US'],['zh','الصينية','中文','🇨🇳','zh-CN'],['ja','اليابانية','日本語','🇯🇵','ja-JP'],['ko','الكورية','한국어','🇰🇷','ko-KR'],['fr','الفرنسية','Français','🇫🇷','fr-FR'],['es','الإسبانية','Español','🇪🇸','es-ES'],['de','الألمانية','Deutsch','🇩🇪','de-DE'],['it','الإيطالية','Italiano','🇮🇹','it-IT'],['pt','البرتغالية','Português','🇵🇹','pt-PT'],['tr','التركية','Türkçe','🇹🇷','tr-TR'],['ru','الروسية','Русский','🇷🇺','ru-RU'],['hi','الهندية','हिन्दी','🇮🇳','hi-IN'],['ur','الأردية','اردو','🇵🇰','ur-PK'],['id','الإندونيسية','Bahasa Indonesia','🇮🇩','id-ID'],['nl','الهولندية','Nederlands','🇳🇱','nl-NL'],['sw','السواحيلية','Kiswahili','🌍','sw'],['fa','الفارسية','فارسی','🇮🇷','fa-IR'],['el','اليونانية','Ελληνικά','🇬🇷','el-GR'],
+ ['ar','العربية','العربية','🇾🇪','ar-SA'],['en','الإنجليزية','English','🇬🇧','en-US'],['zh','الصينية','中文','🇨🇳','zh-CN'],['ja','اليابانية','日本語','🇯🇵','ja-JP'],['ko','الكورية','한국어','🇰🇷','ko-KR'],['fr','الفرنسية','Français','🇫🇷','fr-FR'],['es','الإسبانية','Español','🇪🇸','es-ES'],['de','الألمانية','Deutsch','🇩🇪','de-DE'],['it','الإيطالية','Italiano','🇮🇹','it-IT'],['pt','البرتغالية','Português','🇵🇹','pt-PT'],['tr','التركية','Türkçe','🇹🇷','tr-TR'],['ru','الروسية','Русский','🇷🇺','ru-RU'],['hi','الهندية','हिन्दी','🇮🇳','hi-IN'],['ur','الأردية','اردو','🇵🇰','ur-PK'],['id','الإندونيسية','Bahasa Indonesia','🇮🇩','id-ID'],['nl','الهولندية','Nederlands','🇳🇱','nl-NL'],['sw','السواحيلية','Kiswahili','🌍','sw'],['fa','الفارسية','فارسی','🇮🇷','fa-IR'],['el','اليونانية','Ελληνικά','🇬🇷','el-GR'],
  ['bn','البنغالية','বাংলা','🇧🇩','bn-BD'],['vi','الفيتنامية','Tiếng Việt','🇻🇳','vi-VN'],['th','التايلاندية','ไทย','🇹🇭','th-TH'],['he','العبرية','עברית','🇮🇱','he-IL'],['pl','البولندية','Polski','🇵🇱','pl-PL'],['cs','التشيكية','Čeština','🇨🇿','cs-CZ'],['da','الدنماركية','Dansk','🇩🇰','da-DK'],['fi','الفنلندية','Suomi','🇫🇮','fi-FI'],['sv','السويدية','Svenska','🇸🇪','sv-SE'],['no','النرويجية','Norsk','🇳🇴','nb-NO'],['uk','الأوكرانية','Українська','🇺🇦','uk-UA'],['ro','الرومانية','Română','🇷🇴','ro-RO'],['hu','المجرية','Magyar','🇭🇺','hu-HU'],['bg','البلغارية','Български','🇧🇬','bg-BG'],['hr','الكرواتية','Hrvatski','🇭🇷','hr-HR'],['ms','الملايوية','Bahasa Melayu','🇲🇾','ms-MY'],['fil','الفلبينية','Filipino','🇵🇭','fil-PH'],['ta','التاميلية','தமிழ்','🇮🇳','ta-IN'],['te','التيلوغوية','తెలుగు','🇮🇳','te-IN'],['af','الأفريقانية','Afrikaans','🇿🇦','af-ZA'],['ca','الكتالونية','Català','🇪🇸','ca-ES'],['sr','الصربية','Српски','🇷🇸','sr-RS'],['sk','السلوفاكية','Slovenčina','🇸🇰','sk-SK'],['sl','السلوفينية','Slovenščina','🇸🇮','sl-SI'],['et','الإستونية','Eesti','🇪🇪','et-EE'],['lv','اللاتفية','Latviešu','🇱🇻','lv-LV'],['lt','الليتوانية','Lietuvių','🇱🇹','lt-LT'],['is','الأيسلندية','Íslenska','🇮🇸','is-IS'],['az','الأذربيجانية','Azərbaycanca','🇦🇿','az-AZ'],['hy','الأرمينية','Հայերեն','🇦🇲','hy-AM'],['ka','الجورجية','ქართული','🇬🇪','ka-GE']
 ];
 const Map<String,List<List<String>>> dictionary={
@@ -33,7 +33,7 @@ const Map<String,List<List<String>>> dictionary={
 const alphabets={'en':'A B C D E F G H I J K L M N O P Q R S T U V W X Y Z','zh':'汉 字 拼 音 学 习 你 好 中 国 人 水 火 山 月','ja':'あ い う え お か き く け こ さ し す せ そ','ko':'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ','ru':'А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ы Э Ю Я','hi':'अ आ इ ई उ ऊ ए ऐ ओ औ क ख ग घ च छ ज झ','ur':'ا ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش','fa':'ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ع غ ف ق ک گ ل م ن و ه ی','el':'Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω'};
 class LanguageLearningPage extends StatefulWidget{const LanguageLearningPage({super.key});@override State<LanguageLearningPage> createState()=>_LanguageLearningPageState();}
 class _LanguageLearningPageState extends State<LanguageLearningPage>{
- final search=TextEditingController();final translationInput=TextEditingController();final tts=FlutterTts();String code='zh',section='قاموس',translated='';bool translating=false;Set<String> learned={};
+ final search=TextEditingController();final translationInput=TextEditingController();final tts=FlutterTts();String code='zh',sourceCode='ar',section='قاموس',translated='';bool translating=false;Set<String> learned={};
  List<String> get lang=>languages.firstWhere((e)=>e[0]==code);List<List<String>> get words=>dictionary[code]??[];
  @override void initState(){super.initState();SharedPreferences.getInstance().then((p){if(mounted)setState(()=>learned=(p.getStringList('lang_learned')??[]).toSet());});}
  Future<void> speak(String s)async{try{await tts.setLanguage(lang[4]);await tts.setSpeechRate(.42);await tts.speak(s);}catch(_){if(mounted)ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('الصوت غير متوفر لهذه اللغة على جهازك.')));}}
@@ -46,13 +46,13 @@ class _LanguageLearningPageState extends State<LanguageLearningPage>{
      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اكتب كلمة أو جملة أولاً.')));
      return;
    }
-   setState(() => translating = true);
+   if (sourceCode == code) {\n     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اختر لغتين مختلفتين للترجمة.')));\n     return;\n   }\n   setState(() => translating = true);
    final client = HttpClient();
    try {
      client.connectionTimeout = const Duration(seconds: 12);
      final uri = Uri.https('api.mymemory.translated.net', '/get', {
        'q': inputText,
-       'langpair': 'ar|${_apiLanguage(code)}',
+       'langpair': '${_apiLanguage(sourceCode)}|${_apiLanguage(code)}',
      });
      final request = await client.getUrl(uri).timeout(const Duration(seconds: 15));
      final response = await request.close().timeout(const Duration(seconds: 15));
@@ -91,7 +91,10 @@ class _LanguageLearningPageState extends State<LanguageLearningPage>{
  ]else if(section=='ترجمة')...[
  Container(padding:const EdgeInsets.all(16),decoration:BoxDecoration(color:const Color(0xFF252B4A),borderRadius:BorderRadius.circular(18),border:Border.all(color:gold.withOpacity(.35))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
  const Text('ترجم ما تكتبه إلى اللغة المختارة',style:TextStyle(color:gold,fontWeight:FontWeight.w900,fontSize:17)),
- const SizedBox(height:8),const Text('لغة الإدخال: العربية  ←  اللغة المستهدفة: تتغير حسب اختيارك أعلاه',style:TextStyle(color:Colors.white70,fontSize:12)),
+ const SizedBox(height:8),const Text('اختر لغة النص الأصلي ثم اللغة التي تريد الترجمة إليها.',style:TextStyle(color:Colors.white70,fontSize:12)),
+ const SizedBox(height:10),const Text('لغة النص الأصلي',style:TextStyle(color:gold,fontWeight:FontWeight.bold)),
+ DropdownButton<String>(isExpanded:true,value:sourceCode,dropdownColor:const Color(0xFF222944),items:languages.map((item)=>DropdownMenuItem(value:item[0],child:Text(item[3]+'  '+item[1]))).toList(),onChanged:(value){if(value!=null)setState(()=>sourceCode=value);}),
+ const SizedBox(height:6),Text('اللغة المستهدفة: '+lang[1],style:const TextStyle(color:gold,fontWeight:FontWeight.bold)),
  const SizedBox(height:12),TextField(controller:translationInput,minLines:2,maxLines:5,textDirection:TextDirection.rtl,decoration:const InputDecoration(hintText:'اكتب كلمة أو جملة أو فقرة بالعربية...',filled:true)),
  const SizedBox(height:12),SizedBox(width:double.infinity,child:FilledButton.icon(onPressed:translating?null:translateText,icon:translating?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.translate),label:Text(translating?'جارٍ الترجمة...':'ترجم إلى '+lang[1]))),
  if(translated.isNotEmpty)...[
