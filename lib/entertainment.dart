@@ -604,7 +604,8 @@ List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
   if (key == 'info_stages') return _generatedInfoStage(stage);
   if (key == 'riddle_stages') return _generatedRiddleStage(stage);
   if (key == 'word_stages') return _generatedWordStage(stage);
-  if (key == 'meaning_stages') return _generatedMeaningStage(stage);\n  if (key == 'math_stages') return _mathQuestionsForStage(stage);
+  if (key == 'meaning_stages') return _generatedMeaningStage(stage);
+  if (key == 'math_stages') return _mathQuestionsForStage(stage);
   if (key == 'true_false_stages') return _trueFalseQuestionsForStage(stage);
   if (bank.isEmpty) return const <Q>[];
   final tier = (stage - 1) ~/ 250;
