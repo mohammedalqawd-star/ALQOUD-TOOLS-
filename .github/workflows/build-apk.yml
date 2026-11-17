@@ -60,6 +60,18 @@ jobs:
           print(f"Enabled core library desugaring in {gradle}")
           PY
 
+      - name: Add Android internet permission
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("android/app/src/main/AndroidManifest.xml")
+          content = path.read_text()
+          permission = '    <uses-permission android:name="android.permission.INTERNET"/>' + chr(10)
+          if "android.permission.INTERNET" not in content:
+              content = content.replace("<application", permission + "    <application", 1)
+              path.write_text(content)
+          PY
+
       - name: Add Android notification permission
         run: |
           python3 - <<'PY'
