@@ -189,6 +189,7 @@ class _HomePageState extends State<HomePage> {
       const QuoteLibraryPage(),
       const ToolsPage(),
       const LanguageLearningPage(),
+      const QuranPage(),
     ];
     return Directionality(
       textDirection: TextDirection.rtl,
@@ -211,6 +212,7 @@ class _HomePageState extends State<HomePage> {
               NavigationDestination(icon: Icon(Icons.format_quote), label: 'عبارات'),
               NavigationDestination(icon: Icon(Icons.calculate_outlined), label: 'الأدوات'),
               NavigationDestination(icon: Icon(Icons.language_rounded), label: 'اللغات'),
+              NavigationDestination(icon: Icon(Icons.menu_book_rounded), label: 'القرآن'),
             ],
           ),
         ),
