@@ -46,7 +46,11 @@ class _LanguageLearningPageState extends State<LanguageLearningPage>{
      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اكتب كلمة أو جملة أولاً.')));
      return;
    }
-   if (sourceCode == code) {\n     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اختر لغتين مختلفتين للترجمة.')));\n     return;\n   }\n   setState(() => translating = true);
+   if (sourceCode == code) {
+     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اختر لغتين مختلفتين للترجمة.')));
+     return;
+   }
+   setState(() => translating = true);
    final client = HttpClient();
    try {
      client.connectionTimeout = const Duration(seconds: 12);
