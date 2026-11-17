@@ -482,10 +482,42 @@ List<Q> _trueFalseQuestionsForStage(int stage) {
   return out;
 }
 
-// Every stage receives a stable, non-repeating slice of the available bank.
+// Stage generators keep each category in its own question domain.
+bool _isPrimeNumber(int n){if(n<2)return false;for(var d=2;d*d<=n;d++){if(n%d==0)return false;}return true;}
+List<Q> _generatedInfoStage(int stage){
+ final out=<Q>[];final r=math.Random(stage*7919+17);
+ for(var i=0;i<10;i++){final seed=stage*10+i;final kind=(stage+i)%6;late String prompt;late int answer;late List<int> distractors;
+ switch(kind){
+ case 0: final n=31+seed*7;answer=n%2==0?1:0;prompt='هل العدد $n زوجي أم فردي؟';distractors=[0,1];break;
+ case 1: final n=11+seed*3;answer=n*n;prompt='ما مربع العدد $n؟';distractors=[answer+n,answer+2,answer-1];break;
+ case 2: final n=12+seed;answer=n*(n+1)~/2;prompt='ما مجموع الأعداد من 1 إلى $n؟';distractors=[answer+n,answer+1,answer-1];break;
+ case 3: final n=3+(seed%97);answer=n*1000;prompt='كم متراً تساوي $n كيلومتر؟';distractors=[n*100,n*10,n*10000];break;
+ case 4: final n=5+(seed%80);answer=n*4;prompt='ما محيط مربع طول ضلعه $n وحدة؟';distractors=[n*2,n*3,n*5];break;
+ default: final n=4+(seed%40);answer=n*(n+1);prompt='مستطيل طوله ${n+1} وعرضه $n؛ ما مساحته؟';distractors=[n+n+1,n*n,n*(n+2)];break;
+ }
+ final opts=<int>{answer,...distractors}..removeWhere((v)=>v<0);while(opts.length<4){opts.add(answer+1+opts.length+r.nextInt(9));}
+ final choices=opts.take(4).toList()..shuffle(math.Random(seed*103));out.add(Q(prompt,choices.map((v)=>v.toString()).toList(),choices.toList().indexOf(answer)));
+ }
+ return out;
+}
+List<Q> _generatedRiddleStage(int stage){
+ final out=<Q>[];for(var i=0;i<10;i++){final n=stage*10+i+3;final kind=(stage+i)%5;late String prompt;late int answer;
+ switch(kind){case 0:answer=n+7;prompt='لغز العدد: أنا عدد إذا أضفت إليّ 7 أصبحت $n+7. ما أنا؟';break;case 1:answer=n*2;prompt='لغز مضاعفة: عدد إذا ضاعفته أصبح ${n*2}. ما العدد؟';break;case 2:answer=n-4;prompt='لغز: عدد أكبر مني بأربعة يساوي $n. ما العدد؟';break;case 3:answer=n*n;prompt='لغز المربع: ما العدد الذي مربعه يساوي ${n*n}؟';break;default:answer=n%9+1;prompt='لغز الباقي: ما باقي قسمة ${n+n%9+1} على 9؟';break;}
+ final opts=<int>{answer,answer+1,answer+2,answer>1?answer-1:answer+3}.toList()..shuffle(math.Random(stage*991+i));out.add(Q(prompt,opts.map((v)=>v.toString()).toList(),opts.indexOf(answer)));
+ }return out;
+}
+List<Q> _generatedWordStage(int stage){
+ final out=<Q>[];final patterns=['ما الكلمة التي تدل على هذا الوصف؟ ','اختر المفردة المناسبة للتلميح: ','أي كلمة تعبّر عن المعنى الآتي؟ ','خمن المفردة من الوصف التالي: '];
+ for(var i=0;i<10;i++){final idx=(stage*7+i*3)%words.length;final w=words[idx];final clue=switch((stage+i)%3){0=>w.hint1,1=>w.hint2,_=>w.hint3};final distractors=words.where((x)=>x.word!=w.word).toList()..shuffle(math.Random(stage*101+i));final opts=<String>[w.word,...distractors.take(3).map((x)=>x.word)]..shuffle(math.Random(stage*313+i));out.add(Q(patterns[(stage+i)%patterns.length]+clue,opts,opts.indexOf(w.word)));}return out;
+}
+List<Q> _generatedMeaningStage(int stage){
+ final out=<Q>[];final formats=['ما معنى كلمة «','اختر التفسير الأدق لكلمة «','أي شرح يناسب مفردة «','ما المقصود بالمفردة «'];
+ for(var i=0;i<10;i++){final idx=(stage*11+i*5)%wordMeanings.length;final w=wordMeanings[idx];final distractors=wordMeanings.where((x)=>x.word!=w.word).toList()..shuffle(math.Random(stage*127+i));final opts=<String>[w.meaning,...distractors.take(3).map((x)=>x.meaning)]..shuffle(math.Random(stage*719+i));out.add(Q(formats[(stage+i)%formats.length]+w.word+'»؟',opts,opts.indexOf(w.meaning)));}return out;
+}
+\n// Every stage receives a stable, non-repeating slice of the available bank.
 // The four bands raise the instruction complexity; factual content is not fabricated.
 List<Q> _questionsForStage(List<Q> bank, int stage, String key) {
-  if (key == 'math_stages') return _mathQuestionsForStage(stage);
+  if (key == 'info_stages') return _generatedInfoStage(stage);\n  if (key == 'riddle_stages') return _generatedRiddleStage(stage);\n  if (key == 'word_stages') return _generatedWordStage(stage);\n  if (key == 'meaning_stages') return _generatedMeaningStage(stage);\n  if (key == 'math_stages') return _mathQuestionsForStage(stage);
   if (key == 'true_false_stages') return _trueFalseQuestionsForStage(stage);
   if (bank.isEmpty) return const <Q>[];
   final tier = (stage - 1) ~/ 250;
