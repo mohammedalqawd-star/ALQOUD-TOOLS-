@@ -90,7 +90,7 @@ class _LanguageLearningPageState extends State<LanguageLearningPage>{
  if(section=='قاموس')...[
  TextField(controller:search,onChanged:(_)=>setState((){}),textDirection:TextDirection.rtl,decoration:InputDecoration(hintText:'اكتب كلمة عربية مثل: مرحبا أو ماء',prefixIcon:const Icon(Icons.search),filled:true,fillColor:const Color(0xFF222944),border:OutlineInputBorder(borderRadius:BorderRadius.circular(15)))),
  const SizedBox(height:7),const Text('قاموس البداية يعمل دون إنترنت ويعرض الترجمات المتوفرة فقط.',style:TextStyle(color:Colors.white54,fontSize:11)),
- if(filtered.isEmpty)notice('لم نجد الكلمة. جرّب: مرحبا، شكرا، نعم، لا، ماء، كتاب، بيت، صديق.'),
+ if(filtered.isEmpty)notice('القاموس المحلي لهذه اللغة محدود حالياً. افتح تبويب «ترجمة» لإدخال أي كلمة أو جملة واختيار لغة المصدر واللغة المطلوبة.'),
  ...filtered.map(wordCard),
  ]else if(section=='ترجمة')...[
  Container(padding:const EdgeInsets.all(16),decoration:BoxDecoration(color:const Color(0xFF252B4A),borderRadius:BorderRadius.circular(18),border:Border.all(color:gold.withOpacity(.35))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
